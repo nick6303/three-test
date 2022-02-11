@@ -9,6 +9,14 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "dat.gui": "^0.7.7",
+    "pug": "^3.0.2",
+    "pug-filters": "^4.0.0",
+    "pug-html-loader": "^1.1.5",
+    "pug-loader": "^2.4.0",
+    "pug-plain-loader": "^1.1.0",
+    "sass": "^1.49.7",
+    "sass-loader": "^10.1.1",
     "three": "^0.137.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12"

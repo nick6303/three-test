@@ -1,12 +1,12 @@
-<template>
-  <div class="hello" ref="hello"></div>
+<template lang="pug">
+.hello(ref="hello")
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
 
-export default defineComponent({
+export default {
   name: 'HelloWorld',
   setup() {
     const hello = ref(null)
@@ -28,16 +28,16 @@ export default defineComponent({
         45,
         window.innerWidth / window.innerHeight,
         0.1,
-        100
+        200
       )
-      camera.position.set(10, 10, 10) // 相機位置
+      camera.position.set(100, 100, 100) // 相機位置
       camera.lookAt(scene.position) // 相機焦點
 
       let pointLight = new THREE.PointLight(0xffffff)
       pointLight.position.set(10, 10, -10)
       scene.add(pointLight)
 
-      const geometry = new THREE.BoxGeometry(1, 1, 1) // 幾何體
+      const geometry = new THREE.BoxGeometry(10, 10, 10) // 幾何體
       const material = new THREE.MeshPhongMaterial({
         color: 0x0000ff,
       }) // 材質
@@ -70,5 +70,5 @@ export default defineComponent({
     })
     return { hello }
   },
-})
+}
 </script>
