@@ -162,7 +162,6 @@ export default {
 
       gui = new dat.GUI()
       gui.add(datGUIControls, 'startTracking').onChange(function (e) {
-        console.log(e)
         startTracking = e
         if (invert > 0) {
           if (startTracking) {

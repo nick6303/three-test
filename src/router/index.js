@@ -14,17 +14,22 @@ const routes = [
   {
     path: '/light',
     name: 'light',
-    component: () => import('@v/Light.vue'),
+    component: () => import('@v/Creeper/Light.vue'),
   },
   {
     path: '/head',
     name: 'head',
-    component: () => import('@v/Head.vue'),
+    component: () => import('@v/Creeper/Head.vue'),
   },
   {
     path: '/walk',
     name: 'walk',
-    component: () => import('@v/Walk.vue'),
+    component: () => import('@v/Creeper/Walk.vue'),
+  },
+  {
+    path: '/snow',
+    name: 'snow',
+    component: () => import('@v/Point/Snow.vue'),
   },
 ]
 
