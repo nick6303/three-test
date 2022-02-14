@@ -12,33 +12,52 @@ export default {
   setup() {
     const snow = ref(null)
 
-    let camera, scene, renderer, cameraControl
+    let renderer, scene, camera
+    let cameraControl
 
-    const init = () => {
-      scene = new THREE.Scene()
+    // points
+    let points
+    let positions = []
+    let velocity = []
 
-      // 相機設定與 OrbitControls
-      camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
+    // 建立粒子系統
+    function createPoints() {
+      const snowimage = require('@img/snowflake.png')
+      const texture = new THREE.TextureLoader().load(snowimage)
+
+      const material = new THREE.PointsMaterial({
+        size: 5,
+        map: texture,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        transparent: true,
+        opacity: 1,
+      })
+
+      const geometry = new THREE.BufferGeometry()
+
+      for (let i = 0; i < 15000; i++) {
+        const x = THREE.Math.randInt(-250, 250)
+        const y = THREE.Math.randInt(-250, 250)
+        const z = THREE.Math.randInt(-250, 250)
+        positions.push(x, y, z)
+        const velocityX = THREE.Math.randFloat(-0.16, 0.16)
+        const velocityY = THREE.Math.randFloat(0.1, 0.3)
+        velocity.push(velocityX, velocityY, 0)
+      }
+
+      geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute(positions, 3)
       )
 
-      camera.position.set(30, 30, 30)
-      camera.lookAt(scene.position)
+      points = new THREE.Points(geometry, material)
+      scene.add(points)
+    }
 
-      // 渲染器設定
-      renderer = new THREE.WebGLRenderer()
-      renderer.setSize(window.innerWidth, window.innerHeight)
-      renderer.shadowMap.enabled = true // 設定需渲染陰影效果
-      renderer.shadowMap.type = 2 // THREE.PCFSoftShadowMap
-
-      // 建立 OrbitControls
-      cameraControl = new OrbitControls(camera, renderer.domElement)
-      cameraControl.enableDamping = true // 啟用阻尼效果
-      cameraControl.dampingFactor = 0.25 // 阻尼系數
-
+    function init() {
+      // scene
+      scene = new THREE.Scene()
       scene.fog = new THREE.FogExp2(0x000000, 0.0008)
 
       // camera
@@ -51,52 +70,56 @@ export default {
       camera.position.set(0, 0, 100)
       camera.lookAt(scene.position)
 
+      // renderer
+      renderer = new THREE.WebGLRenderer()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+
+      // OrbitControls
+      cameraControl = new OrbitControls(camera, renderer.domElement)
+      cameraControl.enableDamping = true
+      cameraControl.dampingFactor = 0.25
+
       createPoints()
 
-      // 將渲染出來的畫面放到網頁上的 DOM
-      document.body.appendChild(renderer.domElement)
+      snow.value.appendChild(renderer.domElement)
+    }
+
+    function animation() {
+      const positions = points.geometry.attributes.position.array
+      for (let i = 0; i < positions.length; i++) {
+        switch ((i + 1) % 3) {
+          case 1:
+            positions[i] -= velocity[i]
+            if (positions[i] <= -250) {
+              positions[i] = 250
+              if (positions[i] <= -250 || positions[i] >= 250)
+                velocity[i] = velocity[i] * -1
+            }
+            break
+          case 2:
+            positions[i] -= velocity[i]
+            if (positions[i] <= -250) {
+              positions[i] = 250
+            }
+            break
+          default:
+            break
+        }
+      }
+
+      points.geometry.attributes.position.needsUpdate = true
     }
 
     function render() {
-      cameraControl.update() // 需設定 update
       requestAnimationFrame(render)
+      cameraControl.update()
+      animation()
       renderer.render(scene, camera)
     }
-
-    const particleCount = 15000
-    let points
-
-    // 建立粒子系統
-    function createPoints() {
-      const geometry = new THREE.BufferGeometry()
-
-      const texture = new THREE.TextureLoader().load('./snowflake.png')
-      let material = new THREE.PointsMaterial({
-        size: 5,
-        map: texture,
-        blending: THREE.AdditiveBlending,
-        depthTest: false,
-        transparent: true,
-        opacity: 0.7,
-      })
-
-      const range = 250
-      for (let i = 0; i < particleCount; i++) {
-        const x = THREE.Math.randInt(-range, range)
-        const y = THREE.Math.randInt(-range, range)
-        const z = THREE.Math.randInt(-range, range)
-
-        const point = new THREE.Vector3(x, y, z)
-        geometry.vertices.push(point)
-      }
-
-      points = new THREE.Points(geometry, material)
-      scene.add(points)
-    }
-
     onMounted(() => {
       init()
       render()
+
       window.addEventListener('resize', function () {
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix()

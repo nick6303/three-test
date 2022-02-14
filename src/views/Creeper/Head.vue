@@ -151,7 +151,7 @@ export default {
       createCreeper()
 
       // 將渲染出來的畫面放到網頁上的 DOM
-      document.body.appendChild(renderer.domElement)
+      creeper.value.appendChild(renderer.domElement)
     }
 
     function render() {

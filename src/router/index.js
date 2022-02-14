@@ -27,6 +27,11 @@ const routes = [
     component: () => import('@v/Creeper/Walk.vue'),
   },
   {
+    path: '/point',
+    name: 'point',
+    component: () => import('@v/Point/Point.vue'),
+  },
+  {
     path: '/snow',
     name: 'snow',
     component: () => import('@v/Point/Snow.vue'),
