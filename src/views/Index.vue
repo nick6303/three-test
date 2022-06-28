@@ -9,6 +9,8 @@
   h1 光點
   router-link(to="/point") 基本點點
   router-link(to="/snow") 雪花
+  h1 苦力怕與光點
+  router-link(to="/manandsnow") 苦力怕與雪
 </template>
 <script>
 export default {

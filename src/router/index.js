@@ -36,6 +36,11 @@ const routes = [
     name: 'snow',
     component: () => import('@v/Point/Snow.vue'),
   },
+  {
+    path: '/manandsnow',
+    name: 'manandsnow',
+    component: () => import('@v/Creeper/WithSnow.vue'),
+  },
 ]
 
 export const router = createRouter({
