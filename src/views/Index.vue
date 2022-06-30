@@ -11,6 +11,11 @@
   router-link(to="/snow") 雪花
   h1 苦力怕與光點
   router-link(to="/manandsnow") 苦力怕與雪
+  h1 爆炸
+  router-link(to="/explose") 爆炸
+  router-link(to="/withExplose") 苦力怕爆炸
+  h1 機房
+  router-link(to="/server") 機房
 </template>
 <script>
 export default {

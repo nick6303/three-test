@@ -41,6 +41,21 @@ const routes = [
     name: 'manandsnow',
     component: () => import('@v/Creeper/WithSnow.vue'),
   },
+  {
+    path: '/explose',
+    name: 'explose',
+    component: () => import('@v/Point/Explose.vue'),
+  },
+  {
+    path: '/withexplose',
+    name: 'withexplose',
+    component: () => import('@v/Creeper/WithExplose.vue'),
+  },
+  {
+    path: '/server',
+    name: 'server',
+    component: () => import('@v/Server/Server.vue'),
+  },
 ]
 
 export const router = createRouter({

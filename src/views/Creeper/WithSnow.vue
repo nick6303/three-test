@@ -171,7 +171,7 @@ export default {
 
       // 簡單的地板
       const planeGeometry = new THREE.PlaneGeometry(300, 300)
-      const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
+      const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff }) // 地板材質設定
       let plane = new THREE.Mesh(planeGeometry, planeMaterial)
       plane.rotation.x = -0.5 * Math.PI
       plane.position.set(0, -7, 0)
@@ -185,8 +185,8 @@ export default {
       // 設置聚光燈幫忙照亮物體
       let spotLight = new THREE.SpotLight(0xf0f0f0)
       spotLight.position.set(-10, 30, 20)
-      spotLight.castShadow = false
-      scene.add(spotLight)
+      // spotLight.castShadow = false
+      // scene.add(spotLight)
 
       // 點光源
       pointLight = new THREE.PointLight(0xf0f0f0, 1, 100) // 顏色, 強度, 距離
