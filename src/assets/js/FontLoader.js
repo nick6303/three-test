@@ -1,36 +1,15 @@
-import { FileLoader, Loader, ShapePath } from 'three'
+import { Loader, ShapePath } from 'three'
 
 class FontLoader extends Loader {
   constructor(manager) {
     super(manager)
   }
 
-  load(url, onLoad, onProgress, onError) {
+  load(url, onLoad) {
     const scope = this
-    const loader = new FileLoader(this.manager)
-    loader.setPath(this.path)
-    loader.setRequestHeader(this.requestHeader)
-    loader.setWithCredentials(scope.withCredentials)
-    loader.load(
-      url,
-      function (text) {
-        let json
-        console.log(url, text)
-        try {
-          json = JSON.parse(text)
-        } catch (e) {
-          console.warn(
-            'THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.'
-          )
-          json = JSON.parse(text.substring(65, text.length - 2))
-        }
-
-        const font = scope.parse(json)
-        if (onLoad) onLoad(font)
-      },
-      onProgress,
-      onError
-    )
+    let json = require('@fonts/Noto Sans CJK TC Medium_Regular.json')
+    const font = scope.parse(json)
+    if (onLoad) onLoad(font)
   }
 
   parse(json) {

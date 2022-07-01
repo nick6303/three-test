@@ -9,39 +9,37 @@ import * as THREE from 'three'
 
 import '@js/PointerLockControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { FontLoader } from '@js/FontLoader.js'
+import { server, text } from './utils'
+import { cloneDeep } from 'lodash'
+import data from './data'
 
-class server {
-  constructor() {
-    const headGeo = new THREE.BoxGeometry(4, 4, 4)
-    const faceImg = require('@img/creeper_face.png')
-    const headMap = new THREE.TextureLoader().load(faceImg)
-    // 苦力怕皮膚貼圖
-    const skinImg = require('@img/creeper_skin.png')
-    const skinMap = new THREE.TextureLoader().load(skinImg)
+let scene = new THREE.Scene()
 
-    // 準備頭部與臉的材質
-    const headMaterials = []
-    for (let i = 0; i < 6; i++) {
-      let map
+const createBox = ({ position }) => {
+  let creeperObj = new server(position)
+  scene.add(creeperObj.cabinet)
+}
 
-      if (i === 1) map = headMap
-      else map = skinMap
+const createText = (message, position) => {
+  const textObj = new text(message, position)
+  scene.add(textObj.text)
+}
 
-      headMaterials.push(new THREE.MeshStandardMaterial({ map: map }))
-    }
+function createPlane(row) {
+  const planeGeometry = new THREE.PlaneGeometry(row.width, row.long)
+  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
+  let plane = new THREE.Mesh(planeGeometry, planeMaterial)
+  plane.rotation.x = -0.5 * Math.PI
+  plane.position.set(...row.position)
+  plane.receiveShadow = true
+  plane.name = 'floor'
+  scene.add(plane)
 
-    this.cabinet = new THREE.Group()
-    for (let p = 0; p < 6; p++) {
-      for (let i = 0; i < 6; i++) {
-        const host = new THREE.Mesh(headGeo, headMaterials)
-        const y = i * 4 + 2
-        const x = p * 6
-        host.position.set(x, y, 0)
-        this.cabinet.add(host)
-      }
-    }
-  }
+  const textPosition = cloneDeep(row.position)
+  textPosition[0] -= row.width / 2 - 2
+  textPosition[1] += 0.1
+  textPosition[2] += row.long / 2 - 2
+  createText(row.houseName, textPosition)
 }
 
 export default {
@@ -58,41 +56,8 @@ export default {
     let prevTime = Date.now() // 初始時間
     let velocity = new THREE.Vector3() // 移動速度向量
     let direction = new THREE.Vector3() // 移動方向向量
-    let scene = new THREE.Scene()
 
-    const createBox = () => {
-      let creeperObj = new server()
-      scene.add(creeperObj.cabinet)
-    }
-
-    const createText = (message, position) => {
-      const loader = new FontLoader()
-      loader.load('@mock/helvetiker_regular.typeface.json', function (font) {
-        const color = 0x006699
-
-        const matLite = new THREE.MeshBasicMaterial({
-          color: color,
-          transparent: true,
-          opacity: 0.4,
-          side: THREE.DoubleSide,
-        })
-
-        const shapes = font.generateShapes(message, 100)
-
-        const geometry = new THREE.ShapeGeometry(shapes)
-
-        geometry.computeBoundingBox()
-
-        const xMid =
-          -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x)
-
-        geometry.translate(xMid, 0, 0)
-
-        const text = new THREE.Mesh(geometry, matLite)
-        text.position = position
-        scene.add(text)
-      })
-    }
+    const cameraPosition = [0, 180, 180]
 
     const init = () => {
       scene = new THREE.Scene()
@@ -105,7 +70,7 @@ export default {
         1,
         1000
       )
-      camera.position.set(0, 50, 50)
+      camera.position.set(...cameraPosition)
       camera.lookAt(scene.position)
 
       // renderer
@@ -117,35 +82,47 @@ export default {
       renderer.shadowMap.type = 2 // THREE.PCFSoftShadowMap
 
       cameraControl = new OrbitControls(camera, renderer.domElement)
-      console.log(cameraControl)
-
-      // 簡單的地板
-      const planeGeometry = new THREE.PlaneGeometry(60, 60)
-      const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
-      let plane = new THREE.Mesh(planeGeometry, planeMaterial)
-      plane.rotation.x = -0.5 * Math.PI
-      plane.position.set(30.5, 0, 0)
-      plane.receiveShadow = true
-      plane.name = 'floor'
-      scene.add(plane)
-
-      let plane2 = new THREE.Mesh(planeGeometry, planeMaterial)
-      plane2.rotation.x = -0.5 * Math.PI
-      plane2.position.set(-30.5, 0, 0)
-      plane2.receiveShadow = true
-      plane.name = 'floor'
-      scene.add(plane2)
 
       // light
       let ambientLight = new THREE.AmbientLight(0x404040)
       scene.add(ambientLight)
       let spotLight = new THREE.SpotLight(0xf0f0f0)
-      spotLight.position.set(-10, 30, 20)
+      spotLight.position.set(0, 500, 500)
       spotLight.castShadow = true
       scene.add(spotLight)
 
-      createBox()
-      createText()
+      data.forEach((house, i) => {
+        const middle = Math.ceil(data.length / 2)
+        let direction = middle > i ? -1 : 1
+        let numb
+        let posiX
+        const planeWidth = 120
+        const planeLong = 120
+
+        if (data.length % 2 === 1) {
+          numb = i + 1 - middle
+          posiX = numb * (planeWidth + 1)
+        } else {
+          numb = i + 1 - middle
+          if (numb > 0) {
+            numb--
+          }
+          posiX = numb * (planeWidth + 1) + ((planeWidth + 1) / 2) * direction
+        }
+
+        createPlane({
+          houseName: house.houseName,
+          width: planeWidth,
+          long: planeLong,
+          position: [posiX, 0, 0],
+        })
+        house.cabinets.forEach(() => {
+          createBox({
+            position: [posiX, 0, 0],
+          })
+        })
+      })
+
       initPointerLockControls()
 
       // 將渲染出來的畫面放到網頁上的 DOM
@@ -155,7 +132,7 @@ export default {
     function initPointerLockControls() {
       // 鼠標鎖定初始化
       controls = new THREE.PointerLockControls(camera)
-      controls.getObject().position.set(0, 50, 50)
+      controls.getObject().position.set(...cameraPosition)
       scene.add(controls.getObject())
 
       const onKeyDown = function (event) {
@@ -265,7 +242,7 @@ export default {
       init()
       render()
     })
-    return { serverRef }
+    return { serverRef, cameraControl }
   },
 }
 </script>
