@@ -166,6 +166,8 @@ export default {
       renderer.shadowMap.type = 2 // THREE.PCFSoftShadowMap
 
       cameraControl = new OrbitControls(camera, renderer.domElement)
+      cameraControl.listenToKeyEvents(window)
+      cameraControl.keyPanSpeed = 50
 
       // light
       let ambientLight = new THREE.AmbientLight(0x404040)
@@ -267,12 +269,16 @@ export default {
       // 控制器下墜超過 -2000 則重置位置
       if (y < 10) {
         controls.getObject().position.set(x, 10, z)
+        // cameraControl.target.set(x, 10, z)
+      } else {
+        // cameraControl.target.set(x, y, z)
       }
 
       prevTime = time
     }
 
     function render() {
+      cameraControl.update()
       pointerLockControlsRender()
 
       requestAnimationFrame(render)
