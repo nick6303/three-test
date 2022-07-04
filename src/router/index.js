@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/',
-    name: 'index',
+    path: '/menu',
+    name: 'menu',
     component: () => import('@v/Index.vue'),
   },
   {
@@ -52,7 +52,7 @@ const routes = [
     component: () => import('@v/Creeper/WithExplose.vue'),
   },
   {
-    path: '/server',
+    path: '/',
     name: 'server',
     component: () => import('@v/Server/Server.vue'),
   },

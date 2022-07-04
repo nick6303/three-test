@@ -1,7 +1,7 @@
 module.exports = {
   chainWebpack: (config) => {
     config.plugin('html').tap((args) => {
-      args[0].title = 'TWM DCN IP管理平台'
+      args[0].title = 'Three js 測試'
       return args
     })
     // pug
