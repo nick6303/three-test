@@ -114,7 +114,7 @@ const generateStructor = () => {
         0,
         Math.floor(cabinetIndex / limit),
         hostOption.hostLong,
-        50
+        hostOption.hostLong * 4
       )
 
       createCabinets({
