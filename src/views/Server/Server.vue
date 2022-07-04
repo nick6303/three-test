@@ -9,37 +9,120 @@ import * as THREE from 'three'
 
 import '@js/PointerLockControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { server, text } from './utils'
+import { server, text, plane } from './utils'
 import { cloneDeep } from 'lodash'
 import data from './data'
 
 let scene = new THREE.Scene()
 
-const createBox = ({ position }) => {
-  let creeperObj = new server(position)
-  scene.add(creeperObj.cabinet)
+// 主機伺服器參數
+const hostOption = {
+  hostLimit: 6, // 一個機櫃中最多幾台主機
+  hostWidth: 20, // 主機寬度
+  hostLong: 20, // 主機長度
+  hostHieght: 10, // 主機高度
 }
 
-const createText = (message, position) => {
-  const textObj = new text(message, position)
-  scene.add(textObj.text)
+// 創造機櫃
+const createCabinets = ({ position, servers }) => {
+  let serverObj = new server(position, servers, hostOption)
+  scene.add(serverObj.cabinet)
 }
 
-function createPlane(row) {
-  const planeGeometry = new THREE.PlaneGeometry(row.width, row.long)
-  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
-  let plane = new THREE.Mesh(planeGeometry, planeMaterial)
-  plane.rotation.x = -0.5 * Math.PI
-  plane.position.set(...row.position)
-  plane.receiveShadow = true
-  plane.name = 'floor'
-  scene.add(plane)
+// 創造平面及機房名稱
+const createPlane = (row) => {
+  const planeObj = new plane(row)
+  scene.add(planeObj.plane)
 
+  const createText = (message, position) => {
+    const textObj = new text(message, position)
+    scene.add(textObj.text)
+  }
+
+  // 機房名稱
   const textPosition = cloneDeep(row.position)
   textPosition[0] -= row.width / 2 - 2
   textPosition[1] += 0.1
   textPosition[2] += row.long / 2 - 2
   createText(row.houseName, textPosition)
+}
+
+// 產生結構
+const generateStructor = () => {
+  const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
+    const middle = Math.ceil(dataLength / 2)
+    let direction = middle > i ? -1 : 1
+    let numb
+    let posi
+    if (dataLength % 2 === 1) {
+      numb = i + 1 - middle
+      posi = numb * (width + interval) + parentPosi
+    } else {
+      numb = i + 1 - middle
+      if (numb > 0) {
+        numb--
+      }
+      posi =
+        numb * (width + interval) +
+        ((width + interval) / 2) * direction +
+        parentPosi
+    }
+    return posi
+  }
+
+  data.forEach((house, i) => {
+    const planeWidth = 150 // 機房平面寬度
+    const planeLong = 300 // 機房平面長度
+
+    const planePosiX = offsetCenter(data.length, 0, i, planeWidth, 1)
+
+    createPlane({
+      houseName: house.houseName,
+      width: planeWidth,
+      long: planeLong,
+      position: [planePosiX, 0, 0],
+    })
+
+    // 計算一個平面的寬可以塞幾個主機
+    let cabineWidthtLimit = 0
+    while ((cabineWidthtLimit + 1) * (hostOption.hostWidth + 1) <= planeWidth) {
+      cabineWidthtLimit++
+    }
+
+    // 判斷是否需要第二行
+    const limit =
+      house.cabinets.length >= cabineWidthtLimit
+        ? cabineWidthtLimit
+        : house.cabinets.length
+
+    house.cabinets.forEach((item, cabinetIndex) => {
+      let newIndex = ((cabinetIndex + 1) % limit) - 1
+      if (newIndex === -1) {
+        newIndex = limit - 1
+      }
+
+      const cabinetPosiX = offsetCenter(
+        limit,
+        planePosiX,
+        newIndex,
+        hostOption.hostWidth,
+        1
+      )
+
+      const cabinetPosiZ = offsetCenter(
+        Math.ceil(house.cabinets.length / limit),
+        0,
+        Math.floor(cabinetIndex / limit),
+        hostOption.hostLong,
+        50
+      )
+
+      createCabinets({
+        position: [cabinetPosiX, 0, cabinetPosiZ],
+        servers: item.servers,
+      })
+    })
+  })
 }
 
 export default {
@@ -51,13 +134,14 @@ export default {
     const moveBackward = ref(false)
     const moveRight = ref(false)
 
-    let camera, renderer, controls, raycaster
+    let camera, renderer, controls
+    // , raycaster
     let cameraControl
     let prevTime = Date.now() // 初始時間
     let velocity = new THREE.Vector3() // 移動速度向量
     let direction = new THREE.Vector3() // 移動方向向量
 
-    const cameraPosition = [0, 180, 180]
+    const cameraPosition = [0, 180, 180] // 攝影機位置
 
     const init = () => {
       scene = new THREE.Scene()
@@ -91,37 +175,7 @@ export default {
       spotLight.castShadow = true
       scene.add(spotLight)
 
-      data.forEach((house, i) => {
-        const middle = Math.ceil(data.length / 2)
-        let direction = middle > i ? -1 : 1
-        let numb
-        let posiX
-        const planeWidth = 120
-        const planeLong = 120
-
-        if (data.length % 2 === 1) {
-          numb = i + 1 - middle
-          posiX = numb * (planeWidth + 1)
-        } else {
-          numb = i + 1 - middle
-          if (numb > 0) {
-            numb--
-          }
-          posiX = numb * (planeWidth + 1) + ((planeWidth + 1) / 2) * direction
-        }
-
-        createPlane({
-          houseName: house.houseName,
-          width: planeWidth,
-          long: planeLong,
-          position: [posiX, 0, 0],
-        })
-        house.cabinets.forEach(() => {
-          createBox({
-            position: [posiX, 0, 0],
-          })
-        })
-      })
+      generateStructor()
 
       initPointerLockControls()
 
@@ -179,19 +233,9 @@ export default {
       }
       document.addEventListener('keydown', onKeyDown, false)
       document.addEventListener('keyup', onKeyUp, false)
-
-      // 使用 Raycaster 實現簡單碰撞偵測
-      raycaster = new THREE.Raycaster(
-        new THREE.Vector3(),
-        new THREE.Vector3(0, 10, 0),
-        0,
-        10
-      )
     }
 
     function pointerLockControlsRender() {
-      // 使用 Raycaster 判斷腳下是否與場景中物體相交
-      raycaster.ray.origin.copy(controls.getObject().position) // 複製控制器的位置
       // 計算時間差
       const time = Date.now()
       const delta = (time - prevTime) / 1000 // 大約為 0.016
@@ -205,17 +249,15 @@ export default {
       // 判斷按鍵朝什麼方向移動，並設定對應方向速度變化
       direction.z = Number(moveForward.value) - Number(moveBackward.value)
       direction.x = Number(moveLeft.value) - Number(moveRight.value)
-      // direction.normalize() // 向量正規化（長度為 1），確保每個方向保持一定移動量
       if (moveForward.value || moveBackward.value) {
-        velocity.z -= direction.z * 400.0 * delta
+        velocity.z -= direction.z * 1500.0 * delta
       }
       if (moveLeft.value || moveRight.value) {
-        velocity.x -= direction.x * 400.0 * delta
+        velocity.x -= direction.x * 1500.0 * delta
       }
 
       // 根據速度值移動控制器位置
       controls.getObject().translateX(velocity.x * delta)
-      // controls.getObject().translateY(velocity.y * delta)
       controls.getObject().translateZ(velocity.z * delta)
 
       const x = controls.getObject().position.x
@@ -231,7 +273,6 @@ export default {
     }
 
     function render() {
-      // cameraControl.update()
       pointerLockControlsRender()
 
       requestAnimationFrame(render)

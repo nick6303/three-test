@@ -1,10 +1,25 @@
 import * as THREE from 'three'
 import { FontLoader } from '@js/FontLoader.js'
 
+export class plane {
+  constructor(row) {
+    const planeGeometry = new THREE.PlaneGeometry(row.width, row.long)
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
+    this.plane = new THREE.Mesh(planeGeometry, planeMaterial)
+    this.plane.rotation.x = -0.5 * Math.PI
+    this.plane.position.set(...row.position)
+    this.plane.receiveShadow = true
+    this.plane.name = 'floor'
+  }
+}
+
 export class server {
-  constructor(position) {
-    const hostHeight = 10
-    const hostGeo = new THREE.BoxGeometry(20, hostHeight, 20)
+  constructor(position, servers, option = {}) {
+    const hostWidth = option.hostWidth ?? 20
+    const hostHeight = option.hostHeight ?? 10
+    const hostLong = option.hostLong ?? 20
+    const hostLimit = option.hostLimit ?? 6
+    const hostGeo = new THREE.BoxGeometry(hostWidth, hostHeight, hostLong)
     const frontImg = require('@img/serverFront.jpg')
     const frontMap = new THREE.TextureLoader().load(frontImg)
     const backImg = require('@img/serverBack.png')
@@ -15,7 +30,7 @@ export class server {
     const topMap = new THREE.TextureLoader().load(topImg)
 
     // 準備頭部與臉的材質
-    const headMaterials = []
+    const hostMaterials = []
     for (let i = 0; i < 6; i++) {
       let map
       switch (i) {
@@ -28,7 +43,7 @@ export class server {
         case 2:
           map = topMap
           break
-        case 6:
+        case 0:
           map = topMap
           break
         default:
@@ -36,31 +51,72 @@ export class server {
           break
       }
 
-      headMaterials.push(new THREE.MeshStandardMaterial({ map: map }))
+      hostMaterials.push(new THREE.MeshStandardMaterial({ map: map }))
     }
 
     this.cabinet = new THREE.Group()
-    const hostlength = 5
 
-    for (let i = 0; i < hostlength; i++) {
-      const host = new THREE.Mesh(hostGeo, headMaterials)
+    for (let i = 0; i < servers.length; i++) {
+      const host = new THREE.Mesh(hostGeo, hostMaterials)
 
-      const translateY = i * hostHeight + 5 - 30
+      const translateY = i * hostHeight + 5 - (hostHeight * hostLimit) / 2
       host.translateY(translateY)
 
       this.cabinet.add(host)
     }
 
-    const helper = new THREE.BoxHelper(
-      new THREE.Mesh(new THREE.BoxGeometry(20, 60, 20))
+    const boxGeo = new THREE.BoxGeometry(
+      hostWidth + 1,
+      hostHeight * hostLimit + 1,
+      hostLong + 1
     )
-    helper.material.color.setHex(0x101010)
-    helper.material.blending = THREE.AdditiveBlending
-    helper.material.transparent = true
-    this.cabinet.add(helper)
+    const boxMaterials = []
+    const boxSideImg = require('@img/boxSide.jpg')
+    const boxSideMap = new THREE.TextureLoader().load(boxSideImg)
+    for (let i = 0; i < 6; i++) {
+      let map, opacity, transparent
+      switch (i) {
+        case 1:
+          map = boxSideMap
+          transparent = false
+          opacity = 1
+          break
+        case 2:
+          map = boxSideMap
+          transparent = false
+          opacity = 1
+          break
+        case 3:
+          map = boxSideMap
+          transparent = false
+          opacity = 1
+          break
+        case 0:
+          map = boxSideMap
+          transparent = false
+          opacity = 1
+          break
+        default:
+          map = boxSideMap
+          opacity = 0.1
+          transparent = true
+          break
+      }
+
+      boxMaterials.push(
+        new THREE.MeshStandardMaterial({
+          map: map,
+          opacity: opacity,
+          transparent: transparent,
+          side: THREE.DoubleSide,
+        })
+      )
+    }
+    const box = new THREE.Mesh(boxGeo, boxMaterials)
+    this.cabinet.add(box)
 
     const x = position[0]
-    const y = (6 * 10) / 2
+    const y = (hostHeight * hostLimit) / 2
     const z = position[2]
 
     this.cabinet.position.set(x, y, z)

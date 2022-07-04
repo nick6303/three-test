@@ -4,10 +4,105 @@ export default [
     cabinets: [
       {
         cabinetName: 'cabinet1',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+          { name: 'sony' },
+        ],
+      },
+      {
+        cabinetName: 'cabinet2',
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
       },
     ],
   },
@@ -20,6 +115,7 @@ export default [
       },
       {
         cabinetName: 'cabinet2',
+        servers: [{ name: 'sony' }],
       },
     ],
   },
@@ -32,18 +128,7 @@ export default [
       },
       {
         cabinetName: 'cabinet2',
-      },
-    ],
-  },
-  {
-    houseName: '機房4',
-    cabinets: [
-      {
-        cabinetName: 'cabinet1',
         servers: [{ name: 'sony' }],
-      },
-      {
-        cabinetName: 'cabinet2',
       },
     ],
   },
