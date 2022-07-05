@@ -54,17 +54,6 @@ export class server {
       hostMaterials.push(new THREE.MeshStandardMaterial({ map: map }))
     }
 
-    this.cabinet = new THREE.Group()
-
-    for (let i = 0; i < servers.length; i++) {
-      const host = new THREE.Mesh(hostGeo, hostMaterials)
-
-      const translateY = i * hostHeight + 5 - (hostHeight * hostLimit) / 2
-      host.translateY(translateY)
-
-      this.cabinet.add(host)
-    }
-
     const boxGeo = new THREE.BoxGeometry(
       hostWidth + 1,
       hostHeight * hostLimit + 1,
@@ -112,8 +101,20 @@ export class server {
         })
       )
     }
-    const box = new THREE.Mesh(boxGeo, boxMaterials)
-    this.cabinet.add(box)
+
+    this.cabinet = new THREE.Mesh(boxGeo, boxMaterials)
+    this.cabinet.name = 'cabinet'
+    // const box = new THREE.Mesh(boxGeo, boxMaterials)
+    // this.cabinet.add(box)
+
+    for (let i = 0; i < servers.length; i++) {
+      const host = new THREE.Mesh(hostGeo, hostMaterials)
+
+      const translateY = i * hostHeight + 5 - (hostHeight * hostLimit) / 2
+      host.translateY(translateY)
+
+      this.cabinet.add(host)
+    }
 
     const x = position[0]
     const y = (hostHeight * hostLimit) / 2
