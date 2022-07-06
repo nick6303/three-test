@@ -1,6 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
+  {
+    path: '/',
+    name: 'server',
+    component: () => import('@v/Server/Server.vue'),
+  },
   {
     path: '/menu',
     name: 'menu',
@@ -51,15 +56,10 @@ const routes = [
     name: 'withexplose',
     component: () => import('@v/Creeper/WithExplose.vue'),
   },
-  {
-    path: '/',
-    name: 'server',
-    component: () => import('@v/Server/Server.vue'),
-  },
 ]
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: routes,
 })
 

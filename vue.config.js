@@ -1,4 +1,7 @@
+const isProduction = process.env.NODE_ENV === 'production'
+
 module.exports = {
+  publicPath: isProduction ? '/mywork/threejs/' : '/',
   chainWebpack: (config) => {
     config.plugin('html').tap((args) => {
       args[0].title = 'Three js 測試'
