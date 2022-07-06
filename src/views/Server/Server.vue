@@ -131,29 +131,43 @@ export default {
   name: 'Server',
   setup() {
     const serverRef = ref(null)
-    // const moveForward = ref(false)
-    // const moveLeft = ref(false)
-    // const moveBackward = ref(false)
-    // const moveRight = ref(false)
 
     let camera, cameraControl, renderer, actives, gui
-    // ,controls
-    // let prevTime = Date.now() // 初始時間
-    // let velocity = new THREE.Vector3() // 移動速度向量
-    // let direction = new THREE.Vector3() // 移動方向向量
+    let targetTween, positionTween
+
+    let target = { x: 0, y: 0, z: 0 }
+    let position = { x: 0, y: 180, z: 180 }
+    let targetStart = { x: 0, y: 0, z: 0 }
+    let positionStart = { x: 0, y: 180, z: 180 }
 
     const cameraPosition = [0, 180, 180] // 攝影機位置
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
 
-    function onPointerMove(event) {
+    const onPointerMove = (event) => {
       // 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
 
       pointer.x = (event.clientX / window.innerWidth) * 2 - 1
       pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
     }
-    let targetTween, positionTween
+
+    const backStart = () => {
+      target.x = 0
+      target.y = 0
+      target.z = 0
+      position.x = 0
+      position.y = 180
+      position.z = 180
+      targetStart.x = cameraControl.target.x
+      targetStart.y = cameraControl.target.y
+      targetStart.z = cameraControl.target.z
+      positionStart.x = cameraControl.object.position.x
+      positionStart.y = cameraControl.object.position.y
+      positionStart.z = cameraControl.object.position.z
+      targetTween.start()
+      positionTween.start()
+    }
 
     const init = () => {
       scene = new THREE.Scene()
@@ -190,17 +204,7 @@ export default {
       scene.add(spotLight)
 
       generateStructor()
-
-      // initPointerLockControls()
-
-      const backStart = () => {
-        cameraControl.target.set(0, 0, 0)
-        target = { x: 0, y: 0, z: 0 }
-        position = { x: 0, y: 180, z: 180 }
-        cameraControl.object.position.set(...cameraPosition)
-        targetTween.start()
-        positionTween.start()
-      }
+      tweenHandler()
 
       let controls = new (function () {
         this.backStart = backStart
@@ -210,128 +214,31 @@ export default {
       gui.add(controls, 'backStart')
       // 將渲染出來的畫面放到網頁上的 DOM
       serverRef.value.appendChild(renderer.domElement)
-      tweenHandler()
     }
 
-    let target = { x: 0, y: 0, z: 0 }
-    let position = { x: 0, y: 180, z: 180 }
-
     const tweenHandler = () => {
-      const updateTarget = () => {
-        console.log(target)
-        cameraControl.target.x = target.x
-        cameraControl.target.y = target.y
-        cameraControl.target.z = target.z
+      const onUpdate = () => {
+        cameraControl.target.set(targetStart.x, targetStart.y, targetStart.z)
       }
 
       const updatePostion = () => {
-        cameraControl.object.position.x = position.x
-        cameraControl.object.position.y = position.y
-        cameraControl.object.position.z = position.z
+        cameraControl.object.position.set(
+          positionStart.x,
+          positionStart.y,
+          positionStart.z
+        )
       }
 
-      targetTween = new TWEEN.Tween(cameraControl.target)
-        .to(target, 3000)
+      targetTween = new TWEEN.Tween(targetStart)
+        .to(target, 1200)
         .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(updateTarget)
-        .onComplete(() => {})
+        .onUpdate(onUpdate)
 
-      positionTween = new TWEEN.Tween(cameraControl.object.position)
-        .to(position, 3000)
+      positionTween = new TWEEN.Tween(positionStart)
+        .to(position, 1200)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(updatePostion)
-        .onComplete(() => {})
     }
-
-    // function initPointerLockControls() {
-    //   // 鼠標鎖定初始化
-    //   controls = new THREE.PointerLockControls(camera)
-    //   controls.getObject().position.set(...cameraPosition)
-    //   scene.add(controls.getObject())
-
-    //   const onKeyDown = function (event) {
-    //     switch (event.keyCode) {
-    //       // case 38: // up
-    //       case 87: // w
-    //         moveForward.value = true
-    //         break
-    //       // case 37: // left
-    //       case 65: // a
-    //         moveLeft.value = true
-    //         break
-    //       // case 40: // down
-    //       case 83: // s
-    //         moveBackward.value = true
-    //         break
-    //       // case 39: // right
-    //       case 68: // d
-    //         moveRight.value = true
-    //         break
-    //       default:
-    //         break
-    //     }
-    //   }
-    //   const onKeyUp = function (event) {
-    //     switch (event.keyCode) {
-    //       case 38: // up
-    //       case 87: // w
-    //         moveForward.value = false
-    //         break
-    //       case 37: // left
-    //       case 65: // a
-    //         moveLeft.value = false
-    //         break
-    //       case 40: // down
-    //       case 83: // s
-    //         moveBackward.value = false
-    //         break
-    //       case 39: // right
-    //       case 68: // d
-    //         moveRight.value = false
-    //         break
-    //     }
-    //   }
-    //   document.addEventListener('keydown', onKeyDown, false)
-    //   document.addEventListener('keyup', onKeyUp, false)
-    // }
-
-    // function pointerLockControlsRender() {
-    //   // 計算時間差
-    //   const time = Date.now()
-    //   const delta = (time - prevTime) / 1000 // 大約為 0.016
-    //   prevTime = time
-
-    //   // 設定初始速度變化
-    //   velocity.x -= velocity.x * 10.0 * delta
-    //   velocity.z -= velocity.z * 10.0 * delta
-    //   // velocity.y -= velocity.y * 10.0 * delta // 預設墜落速度
-
-    //   // 判斷按鍵朝什麼方向移動，並設定對應方向速度變化
-    //   direction.z = Number(moveForward.value) - Number(moveBackward.value)
-    //   direction.x = Number(moveLeft.value) - Number(moveRight.value)
-    //   if (moveForward.value || moveBackward.value) {
-    //     velocity.z -= direction.z * 1500.0 * delta
-    //   }
-    //   if (moveLeft.value || moveRight.value) {
-    //     velocity.x -= direction.x * 1500.0 * delta
-    //   }
-
-    //   // 根據速度值移動控制器位置
-    //   controls.getObject().translateX(velocity.x * delta)
-    //   controls.getObject().translateZ(velocity.z * delta)
-
-    //   // const x = controls.getObject().position.x
-    //   // const z = controls.getObject().position.z
-    //   // const y = controls.getObject().position.y
-
-    //   // 控制器下墜超過 -2000 則重置位置
-    //   // if (y < 10) {
-    //   // controls.getObject().position.set(x, 10, z)
-    //   // }
-    //   cameraControl.update()
-
-    //   prevTime = time
-    // }
 
     function pointerHover() {
       // 通过摄像机和鼠标位置更新射线
@@ -370,21 +277,27 @@ export default {
 
     const clickCabinet = () => {
       if (actives) {
-        cameraControl.target.set(...actives.position)
-        cameraControl.object.position.x = actives.position.x
-        cameraControl.object.position.y = actives.position.y
-        cameraControl.object.position.z =
-          actives.position.z + hostOption.hostLong * 4
+        target.x = actives.position.x
+        target.y = actives.position.y
+        target.z = actives.position.z
+        position.x = actives.position.x
+        position.y = actives.position.y
+        position.z = actives.position.z + hostOption.hostLong * 4
+        targetStart.x = cameraControl.target.x
+        targetStart.y = cameraControl.target.y
+        targetStart.z = cameraControl.target.z
+        positionStart.x = cameraControl.object.position.x
+        positionStart.y = cameraControl.object.position.y
+        positionStart.z = cameraControl.object.position.z
+        targetTween.start()
+        positionTween.start()
       }
     }
 
-    function render() {
+    const render = () => {
       cameraControl.update()
-
-      // pointerLockControlsRender()
-
       pointerHover()
-
+      TWEEN.update()
       requestAnimationFrame(render)
       renderer.render(scene, camera)
     }
@@ -400,7 +313,7 @@ export default {
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('click', clickCabinet)
     })
-    return { serverRef, cameraControl }
+    return { serverRef, cameraControl, backStart }
   },
 }
 </script>
