@@ -4,6 +4,8 @@ export default [
     cabinets: [
       {
         cabinetName: 'cabinet1',
+        // x: 100,
+        // z: 100,
         servers: [
           { name: 'sony' },
           { name: 'sony' },

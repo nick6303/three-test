@@ -103,21 +103,19 @@ const generateStructor = () => {
         newIndex = limit - 1
       }
 
-      const cabinetPosiX = offsetCenter(
-        limit,
-        planePosiX,
-        newIndex,
-        hostOption.hostWidth,
-        1
-      )
+      const cabinetPosiX =
+        item.x ??
+        offsetCenter(limit, planePosiX, newIndex, hostOption.hostWidth, 1)
 
-      const cabinetPosiZ = offsetCenter(
-        Math.ceil(house.cabinets.length / limit),
-        0,
-        Math.floor(cabinetIndex / limit),
-        hostOption.hostLong,
-        hostOption.hostLong * 4
-      )
+      const cabinetPosiZ =
+        item.z ??
+        offsetCenter(
+          Math.ceil(house.cabinets.length / limit),
+          0,
+          Math.floor(cabinetIndex / limit),
+          hostOption.hostLong,
+          hostOption.hostLong * 4
+        )
 
       createCabinets({
         position: [cabinetPosiX, 0, cabinetPosiZ],
