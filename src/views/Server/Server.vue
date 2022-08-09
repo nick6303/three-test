@@ -9,11 +9,16 @@ import * as THREE from 'three'
 
 import '@js/PointerLockControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { server, text, plane } from './utils'
+import {
+  // server,
+  text,
+  plane,
+} from './utils'
 import { cloneDeep } from 'lodash'
 import data from './data'
 import * as dat from 'dat.gui'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 let scene = new THREE.Scene()
 
@@ -22,13 +27,30 @@ const hostOption = {
   hostLimit: 6, // 一個機櫃中最多幾台主機
   hostWidth: 20, // 主機寬度
   hostLong: 20, // 主機長度
-  hostHieght: 10, // 主機高度
+  hostHeight: 10, // 主機高度
+}
+
+const createBlender = (position) => {
+  const loader = new GLTFLoader()
+  loader.load('glTF/MaterialsVariantsShoe.gltf', function (gltf) {
+    const x = position[0]
+    // const y = hostOption.hostHeight * hostOption.hostLimit + 10.7
+    const y = 0
+    const z = position[2]
+    gltf.scene.scale.set(100.0, 100.0, 100.0)
+    gltf.scene.position.set(x, y, z)
+    scene.add(gltf.scene)
+  })
 }
 
 // 創造機櫃
-const createCabinets = ({ position, servers }) => {
-  let serverObj = new server(position, servers, hostOption)
-  scene.add(serverObj.cabinet)
+const createCabinets = ({
+  position,
+  //  servers
+}) => {
+  // let serverObj = new server(position, servers, hostOption)
+  createBlender(position)
+  // scene.add(serverObj.cabinet)
 }
 
 // 創造平面及機房名稱

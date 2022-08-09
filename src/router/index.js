@@ -56,6 +56,11 @@ const routes = [
     name: 'withexplose',
     component: () => import('@v/Creeper/WithExplose.vue'),
   },
+  {
+    path: '/shoes',
+    name: 'shoes',
+    component: () => import('@v/Shoes/Shoes.vue'),
+  },
 ]
 
 export const router = createRouter({
