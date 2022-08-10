@@ -9,12 +9,11 @@ import * as THREE from 'three'
 
 import '@js/PointerLockControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import {
-  // server,
-  text,
-  plane,
-} from './utils'
-import { cloneDeep } from 'lodash'
+import // server,
+// text,
+// plane,
+'./utils'
+// import { cloneDeep } from 'lodash'
 import data from './data'
 import * as dat from 'dat.gui'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
@@ -24,51 +23,61 @@ let scene = new THREE.Scene()
 
 // 主機伺服器參數
 const hostOption = {
-  hostLimit: 6, // 一個機櫃中最多幾台主機
-  hostWidth: 20, // 主機寬度
-  hostLong: 20, // 主機長度
-  hostHeight: 10, // 主機高度
+  hostLimit: 60, // 一個機櫃中最多幾台主機
+  hostWidth: 2, // 主機寬度
+  hostLong: 2, // 主機長度
+  hostHeight: 1, // 主機高度
 }
 
-const createBlender = (position) => {
+const createBlender = (position, servers, modelUrl) => {
   const loader = new GLTFLoader()
-  loader.load('glTF/MaterialsVariantsShoe.gltf', function (gltf) {
+  loader.load(modelUrl, function (gltf) {
     const x = position[0]
     // const y = hostOption.hostHeight * hostOption.hostLimit + 10.7
     const y = 0
     const z = position[2]
-    gltf.scene.scale.set(100.0, 100.0, 100.0)
+    gltf.scene.scale.set(1, 1, 1)
     gltf.scene.position.set(x, y, z)
+    gltf.scene.name = 'cabinet'
     scene.add(gltf.scene)
   })
 }
 
 // 創造機櫃
-const createCabinets = ({
-  position,
-  //  servers
-}) => {
+const createCabinets = ({ position, servers, modelUrl }) => {
   // let serverObj = new server(position, servers, hostOption)
-  createBlender(position)
+  createBlender(position, servers, modelUrl)
   // scene.add(serverObj.cabinet)
 }
 
 // 創造平面及機房名稱
 const createPlane = (row) => {
-  const planeObj = new plane(row)
-  scene.add(planeObj.plane)
+  // const planeObj = new plane(row)
+  // scene.add(planeObj.plane)
+  const loader = new GLTFLoader()
+  loader.load(row.url, function (gltf) {
+    const x = row.position[0]
+    // const y = hostOption.hostHeight * hostOption.hostLimit + 10.7
+    const y = 0
+    const z = row.position[2]
+    gltf.scene.scale.set(1, 1, 1)
+    gltf.scene.position.set(x, y, z)
+    gltf.scene.name = 'floor'
 
-  const createText = (message, position) => {
-    const textObj = new text(message, position)
-    scene.add(textObj.text)
-  }
+    scene.add(gltf.scene)
+  })
 
-  // 機房名稱
-  const textPosition = cloneDeep(row.position)
-  textPosition[0] -= row.width / 2 - 2
-  textPosition[1] += 0.1
-  textPosition[2] += row.long / 2 - 2
-  createText(row.houseName, textPosition)
+  // const createText = (message, position) => {
+  //   const textObj = new text(message, position)
+  //   scene.add(textObj.text)
+  // }
+
+  // // 機房名稱
+  // const textPosition = cloneDeep(row.position)
+  // textPosition[0] -= row.width / 2 - 0.5
+  // textPosition[1] += 0.1
+  // textPosition[2] += row.long / 2 - 0.5
+  // createText(row.houseName, textPosition)
 }
 
 // 產生結構
@@ -95,13 +104,14 @@ const generateStructor = () => {
   }
 
   data.forEach((house, i) => {
-    const planeWidth = 150 // 機房平面寬度
-    const planeLong = 300 // 機房平面長度
+    const planeWidth = 30 // 機房平面寬度
+    const planeLong = 30 // 機房平面長度
 
-    const planePosiX = offsetCenter(data.length, 0, i, planeWidth, 1)
+    const planePosiX = offsetCenter(data.length, 0, i, planeWidth, 0.5)
 
     createPlane({
       houseName: house.houseName,
+      url: house.url,
       width: planeWidth,
       long: planeLong,
       position: [planePosiX, 0, 0],
@@ -126,22 +136,25 @@ const generateStructor = () => {
       }
 
       const cabinetPosiX =
-        item.x ??
-        offsetCenter(limit, planePosiX, newIndex, hostOption.hostWidth, 1)
+        item.x !== undefined
+          ? item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
+          : offsetCenter(limit, planePosiX, newIndex, hostOption.hostWidth, 1)
 
       const cabinetPosiZ =
-        item.z ??
-        offsetCenter(
-          Math.ceil(house.cabinets.length / limit),
-          0,
-          Math.floor(cabinetIndex / limit),
-          hostOption.hostLong,
-          hostOption.hostLong * 4
-        )
+        item.z !== undefined
+          ? planeLong / 2 - item.z - hostOption.hostLong / 2
+          : offsetCenter(
+              Math.ceil(house.cabinets.length / limit),
+              0,
+              Math.floor(cabinetIndex / limit),
+              hostOption.hostLong,
+              hostOption.hostLong * 3
+            )
 
       createCabinets({
         position: [cabinetPosiX, 0, cabinetPosiZ],
         servers: item.servers,
+        modelUrl: item.url,
       })
     })
   })
@@ -156,11 +169,11 @@ export default {
     let targetTween, positionTween
 
     let target = { x: 0, y: 0, z: 0 }
-    let position = { x: 0, y: 180, z: 180 }
+    let position = { x: 0, y: 18, z: 18 }
     let targetStart = { x: 0, y: 0, z: 0 }
-    let positionStart = { x: 0, y: 180, z: 180 }
+    let positionStart = { x: 0, y: 18, z: 18 }
 
-    const cameraPosition = [0, 180, 180] // 攝影機位置
+    const cameraPosition = [0, 18, 18] // 攝影機位置
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
@@ -177,8 +190,8 @@ export default {
       target.y = 0
       target.z = 0
       position.x = 0
-      position.y = 180
-      position.z = 180
+      position.y = 18
+      position.z = 18
       targetStart.x = cameraControl.target.x
       targetStart.y = cameraControl.target.y
       targetStart.z = cameraControl.target.z
@@ -198,7 +211,7 @@ export default {
         75,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        500
       )
       camera.position.set(...cameraPosition)
       camera.lookAt(scene.position)
@@ -216,10 +229,10 @@ export default {
       cameraControl.keyPanSpeed = 50
 
       // light
-      let ambientLight = new THREE.AmbientLight(0x404040)
+      let ambientLight = new THREE.AmbientLight(0xffffff)
       scene.add(ambientLight)
-      let spotLight = new THREE.SpotLight(0xf0f0f0)
-      spotLight.position.set(0, 500, 500)
+      let spotLight = new THREE.SpotLight(0xffffff)
+      spotLight.position.set(0, 100, 100)
       spotLight.castShadow = true
       scene.add(spotLight)
 
@@ -250,12 +263,12 @@ export default {
       }
 
       targetTween = new TWEEN.Tween(targetStart)
-        .to(target, 1200)
+        .to(target, 1000)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(onUpdate)
 
       positionTween = new TWEEN.Tween(positionStart)
-        .to(position, 1200)
+        .to(position, 1000)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(updatePostion)
     }
@@ -269,15 +282,19 @@ export default {
       if (intersects.length > 0) {
         if (actives !== intersects[0].object) {
           if (actives) {
-            actives.material.forEach((material) => {
-              material.color.set(0xffffff)
+            actives.children.forEach((child) => {
+              if (child.material) {
+                // child.material.color.set(0xffffff)
+              }
             })
           }
-          if (intersects[0].object.name === 'cabinet') {
+          if (intersects[0].object.parent.name === 'cabinet') {
             serverRef.value.classList.add('pointer')
-            actives = intersects[0].object
-            actives.material.forEach((material) => {
-              material.color.set(0x0)
+            actives = intersects[0].object.parent
+            actives.children.forEach((child) => {
+              if (child.material) {
+                // child.material.color.set(0x424242)
+              }
             })
           } else {
             serverRef.value.classList.remove('pointer')
@@ -286,8 +303,10 @@ export default {
         }
       } else {
         if (actives) {
-          actives.material.forEach((material) => {
-            material.color.set(0xffffff)
+          actives.children.forEach((child) => {
+            if (child.material) {
+              // child.material.color.set(0xffffff)
+            }
           })
         }
         serverRef.value.classList.remove('pointer')
@@ -298,11 +317,11 @@ export default {
     const clickCabinet = () => {
       if (actives) {
         target.x = actives.position.x
-        target.y = actives.position.y
+        target.y = actives.position.y + hostOption.hostHeight * 2
         target.z = actives.position.z
         position.x = actives.position.x
-        position.y = actives.position.y
-        position.z = actives.position.z + hostOption.hostLong * 4
+        position.y = actives.position.y + hostOption.hostHeight * 2
+        position.z = actives.position.z + hostOption.hostLong * 3
         targetStart.x = cameraControl.target.x
         targetStart.y = cameraControl.target.y
         targetStart.z = cameraControl.target.z

@@ -4,7 +4,7 @@ import { FontLoader } from '@js/FontLoader.js'
 export class plane {
   constructor(row) {
     const planeGeometry = new THREE.PlaneGeometry(row.width, row.long)
-    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xacacac })
     this.plane = new THREE.Mesh(planeGeometry, planeMaterial)
     this.plane.rotation.x = -0.5 * Math.PI
     this.plane.position.set(...row.position)
@@ -138,7 +138,7 @@ export class text {
         side: THREE.DoubleSide,
       })
 
-      const shapes = font.generateShapes(message, 5)
+      const shapes = font.generateShapes(message, 0.5)
 
       vm.geometry = new THREE.ShapeGeometry(shapes)
 
