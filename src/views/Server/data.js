@@ -1,7 +1,7 @@
 export default [
   {
     houseName: '機房1',
-    url: 'glTF/plane2.glb',
+    url: 'glTF/plane.glb',
     cabinets: [
       {
         cabinetName: 'cabinet1',
@@ -122,11 +122,46 @@ export default [
         url: 'glTF/cabinets.glb',
         servers: [{ name: 'sony' }],
       },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
+      {
+        cabinetName: 'cabinet2',
+        url: 'glTF/cabinets.glb',
+        servers: [{ name: 'sony' }],
+      },
     ],
   },
   {
     houseName: '機房2',
-    url: 'glTF/plane.glb',
+    url: 'glTF/plane2.glb',
     cabinets: [
       {
         cabinetName: 'cabinet1',

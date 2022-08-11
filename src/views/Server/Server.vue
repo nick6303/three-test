@@ -104,8 +104,8 @@ const generateStructor = () => {
   }
 
   data.forEach((house, i) => {
-    const planeWidth = 30 // 機房平面寬度
-    const planeLong = 30 // 機房平面長度
+    const planeWidth = 60 // 機房平面寬度
+    const planeLong = 60 // 機房平面長度
 
     const planePosiX = offsetCenter(data.length, 0, i, planeWidth, 0.5)
 
@@ -284,7 +284,7 @@ export default {
           if (actives) {
             actives.children.forEach((child) => {
               if (child.material) {
-                // child.material.color.set(0xffffff)
+                child.material.emissive.set(0x0)
               }
             })
           }
@@ -293,7 +293,7 @@ export default {
             actives = intersects[0].object.parent
             actives.children.forEach((child) => {
               if (child.material) {
-                // child.material.color.set(0x424242)
+                child.material.emissive.set(0x424242)
               }
             })
           } else {
@@ -305,7 +305,7 @@ export default {
         if (actives) {
           actives.children.forEach((child) => {
             if (child.material) {
-              // child.material.color.set(0xffffff)
+              child.material.emissive.set(0x0)
             }
           })
         }
