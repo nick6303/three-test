@@ -5,8 +5,8 @@ export default [
     cabinets: [
       {
         cabinetName: 'cabinet1',
-        // x: 0,
-        // z: 0,
+        x: 3,
+        z: 3,
         url: 'glTF/cabinets.glb',
         servers: [
           { name: 'sony' },
@@ -20,6 +20,8 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 6,
+        z: 3,
         servers: [
           { name: 'sony' },
           { name: 'sony' },
@@ -32,6 +34,8 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 9,
+        z: 3,
         servers: [
           { name: 'sony' },
           { name: 'sony' },
@@ -44,6 +48,8 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 12,
+        z: 3,
         servers: [
           { name: 'sony' },
           { name: 'sony' },
@@ -56,6 +62,8 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 15,
+        z: 3,
         servers: [
           { name: 'sony' },
           { name: 'sony' },
@@ -68,6 +76,8 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 18,
+        z: 3,
         servers: [
           { name: 'sony' },
           { name: 'sony' },
@@ -80,81 +90,113 @@ export default [
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 21,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 24,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 27,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 30,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 33,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 36,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 39,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 42,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 45,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 48,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 51,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 54,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 57,
+        z: 3,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 3,
+        z: 10,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 6,
+        z: 10,
         servers: [{ name: 'sony' }],
       },
       {
         cabinetName: 'cabinet2',
         url: 'glTF/cabinets.glb',
+        x: 9,
+        z: 10,
         servers: [{ name: 'sony' }],
       },
     ],

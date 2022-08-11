@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',
     name: 'server',
-    component: () => import('@v/Server/Server.vue'),
+    component: () => import('@v/Server/Server2.vue'),
   },
   {
     path: '/menu',

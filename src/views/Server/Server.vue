@@ -7,13 +7,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as THREE from 'three'
 
-import '@js/PointerLockControls.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import // server,
-// text,
-// plane,
-'./utils'
-// import { cloneDeep } from 'lodash'
+
 import data from './data'
 import * as dat from 'dat.gui'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
