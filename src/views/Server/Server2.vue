@@ -2,99 +2,44 @@
 #Server(ref="serverRef")
 </template>
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import * as THREE from 'three'
+import { ref } from 'vue'
 import data from './data'
 import * as dat from 'dat.gui'
-// import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import useScene from '@/hooks/useScene'
 
-let scene = new THREE.Scene()
+const planeWidth = 60 // 機房平面寬度
+const planeLong = 60 // 機房平面長度
 
-const createPlane = (row) => {
-  const loader = new GLTFLoader()
-  loader.load(row.url, function (gltf) {
-    const x = row.position[0]
-    const y = 0
-    const z = row.position[2]
-    gltf.scene.scale.set(1, 1, 1)
-    gltf.scene.position.set(x, y, z)
-    gltf.scene.name = 'floor'
-
-    scene.add(gltf.scene)
-  })
+// 主機伺服器參數
+const hostOption = {
+  hostLimit: 60, // 一個機櫃中最多幾台主機
+  hostWidth: 2, // 主機寬度
+  hostLong: 2, // 主機長度
+  hostHeight: 1, // 主機高度
 }
 
 export default {
   name: 'server2',
   setup() {
     const serverRef = ref(null)
+    let gui
 
-    let camera, cameraControl, renderer, gui
-    // , actives
-    // let targetTween, positionTween
-
-    const cameraPosition = [0, 18, 18] // 攝影機位置
-    const planeWidth = 60 // 機房平面寬度
-    const planeLong = 60 // 機房平面長度
-
-    const init = () => {
-      scene = new THREE.Scene()
-      scene.fog = new THREE.FogExp2(0x000000, 0.0008)
-
-      // camera
-      camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        1,
-        500
-      )
-      camera.position.set(...cameraPosition)
-      camera.lookAt(scene.position)
-
-      // renderer
-      renderer = new THREE.WebGLRenderer({ antialias: true })
-      renderer.setClearColor(0x80adfc, 1.0)
-      renderer.setClearColor(0x111111, 1.0)
-      renderer.setSize(window.innerWidth, window.innerHeight)
-      renderer.shadowMap.enabled = true
-      renderer.shadowMap.type = 2 // THREE.PCFSoftShadowMap
-
-      cameraControl = new OrbitControls(camera, renderer.domElement)
-      cameraControl.listenToKeyEvents(window)
-      cameraControl.keyPanSpeed = 50
-
-      // light
-      let ambientLight = new THREE.AmbientLight(0xffffff)
-      scene.add(ambientLight)
-      let spotLight = new THREE.SpotLight(0xffffff)
-      spotLight.position.set(0, 100, 100)
-      spotLight.castShadow = true
-      scene.add(spotLight)
-
+    const initFunc = () => {
       generateStructor()
 
       let controls = new (function () {
-        // this.backStart = backStart
-        this.backStart = () => {}
+        this.backStart = backStart
       })()
 
       gui = new dat.GUI()
       gui.add(controls, 'backStart')
-      // 將渲染出來的畫面放到網頁上的 DOM
-      serverRef.value.appendChild(renderer.domElement)
-      // 將渲染出來的畫面放到網頁上的 DOM
-      serverRef.value.appendChild(renderer.domElement)
     }
 
-    const render = () => {
-      cameraControl.update()
-      // pointerHover()
-      // TWEEN.update()
-      requestAnimationFrame(render)
-      renderer.render(scene, camera)
-    }
+    const { createPlane, createBlender, backStart } = useScene(
+      serverRef,
+      initFunc,
+      hostOption
+    )
 
     const generateStructor = () => {
       const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
@@ -127,19 +72,25 @@ export default {
         long: planeLong,
         position: [planePosiX, 0, 0],
       })
+
+      house.cabinets.forEach((item) => {
+        const cabinetPosiX =
+          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
+        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
+
+        createBlender({
+          position: [cabinetPosiX, 0, cabinetPosiZ],
+          modelUrl: item.url,
+        })
+
+        item.servers.forEach((item) => {
+          createBlender({
+            position: [cabinetPosiX, item.y, cabinetPosiZ],
+            modelUrl: 'glTF/server.glb',
+          })
+        })
+      })
     }
-
-    onMounted(() => {
-      init()
-      render()
-      // window.addEventListener('pointermove', onPointerMove)
-      // window.addEventListener('click', clickCabinet)
-    })
-
-    onBeforeUnmount(() => {
-      // window.removeEventListener('pointermove', onPointerMove)
-      // window.removeEventListener('click', clickCabinet)
-    })
 
     return {
       serverRef,
@@ -147,3 +98,9 @@ export default {
   },
 }
 </script>
+
+<style lang="sass" scoped>
+#Server
+  &.pointer
+    cursor: pointer
+</style>
