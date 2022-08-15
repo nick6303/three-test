@@ -7,6 +7,11 @@ const routes = [
     component: () => import('@v/Server/Server2.vue'),
   },
   {
+    path: '/edit',
+    name: 'edit',
+    component: () => import('@v/Edit/Edit.vue'),
+  },
+  {
     path: '/menu',
     name: 'menu',
     component: () => import('@v/Index.vue'),

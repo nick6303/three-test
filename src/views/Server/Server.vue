@@ -9,7 +9,7 @@ import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-import data from './data'
+import data from '@mock'
 import * as dat from 'dat.gui'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'

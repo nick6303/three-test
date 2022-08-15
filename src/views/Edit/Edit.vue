@@ -1,12 +1,14 @@
 <template lang="pug">
-#Server(ref="serverRef")
+#Edit
+  .cabinets
+    .cabinet(v-for="item in data[1].cabinets") 
+
+  .threejs(ref="serverRef")
 </template>
 <script>
 import { ref } from 'vue'
 import data from '@mock/data'
-import * as dat from 'dat.gui'
 import useScene from '@/hooks/useScene'
-
 const planeWidth = 60 // 機房平面寬度
 const planeLong = 60 // 機房平面長度
 
@@ -18,31 +20,26 @@ const hostOption = {
   hostHeight: 1, // 主機高度
 }
 
-const cameraPosition = [0, 45, 45] // 攝影機位置
+const cameraPosition = [0, 40, 0] // 攝影機位置
 
 export default {
-  name: 'server2',
+  name: 'Edit',
   setup() {
     const serverRef = ref(null)
-    let gui
-
     const initFunc = () => {
       generateStructor()
-
-      let controls = new (function () {
-        this.backStart = backStart
-      })()
-
-      gui = new dat.GUI()
-      gui.add(controls, 'backStart')
     }
 
-    const { createPlane, createBlender, backStart } = useScene(
-      serverRef,
+    const {
+      createPlane,
+      // createBlender
+    } = useScene({
+      elementRef: serverRef,
       initFunc,
       hostOption,
-      cameraPosition
-    )
+      cameraPosition,
+      cameraMoveable: false,
+    })
 
     const generateStructor = () => {
       const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
@@ -66,7 +63,7 @@ export default {
         return posi
       }
 
-      const house = data[0]
+      const house = data[1]
       const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
       createPlane({
         houseName: house.houseName,
@@ -76,34 +73,40 @@ export default {
         position: [planePosiX, 0, 0],
       })
 
-      house.cabinets.forEach((item) => {
-        const cabinetPosiX =
-          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
-        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
+      // house.cabinets.forEach((item) => {
+      //   const cabinetPosiX =
+      //     item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
+      //   const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
 
-        createBlender({
-          position: [cabinetPosiX, 0, cabinetPosiZ],
-          modelUrl: item.url,
-        })
+      //   createBlender({
+      //     position: [cabinetPosiX, 0, cabinetPosiZ],
+      //     modelUrl: item.url,
+      //   })
 
-        item.servers.forEach((item) => {
-          createBlender({
-            position: [cabinetPosiX, item.y, cabinetPosiZ],
-            modelUrl: 'glTF/server.glb',
-          })
-        })
-      })
+      //   item.servers.forEach((item) => {
+      //     createBlender({
+      //       position: [cabinetPosiX, item.y, cabinetPosiZ],
+      //       modelUrl: 'glTF/server.glb',
+      //     })
+      //   })
+      // })
     }
 
     return {
       serverRef,
+      data,
     }
   },
 }
 </script>
-
 <style lang="sass" scoped>
-#Server
-  &.pointer
-    cursor: pointer
+#Edit
+  display: flex
+  +size(100vw,100vh)
+  .cabinets
+    width: 300px
+  .threejs
+    +size(calc(100% - 300px),100%)
+    canvas
+      +size(100%,100%)
 </style>

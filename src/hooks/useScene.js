@@ -4,8 +4,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
 
-const cameraPosition = [0, 45, 45] // 攝影機位置
-
 const blenderLoader = async (modelUrl) => {
   return new Promise((resolve) => {
     const loader = new GLTFLoader()
@@ -15,8 +13,14 @@ const blenderLoader = async (modelUrl) => {
   })
 }
 
-function useScene(serverRef, initFunc, hostOption) {
-  let camera, cameraControl, renderer, actives
+function useScene({
+  elementRef,
+  initFunc,
+  hostOption,
+  cameraPosition,
+  cameraMoveable = true,
+}) {
+  let cameraControl, camera, renderer, actives
   let targetTween, positionTween
 
   let target = { x: 0, y: 0, z: 0 }
@@ -51,10 +55,6 @@ function useScene(serverRef, initFunc, hostOption) {
     position.z = cameraPosition[2]
     targetStart.x = cameraControl.target.x
     targetStart.y = cameraControl.target.y
-    targetStart.z = cameraControl.target.z
-    positionStart.x = cameraControl.object.position.x
-    positionStart.y = cameraControl.object.position.y
-    positionStart.z = cameraControl.object.position.z
     targetTween.start()
     positionTween.start()
   }
@@ -66,7 +66,7 @@ function useScene(serverRef, initFunc, hostOption) {
     // camera
     camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      elementRef.value.offsetWidth / elementRef.value.offsetHeight,
       1,
       500
     )
@@ -78,13 +78,19 @@ function useScene(serverRef, initFunc, hostOption) {
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setClearColor(0x80adfc, 1.0)
     renderer.setClearColor(0x111111, 1.0)
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(
+      elementRef.value.offsetWidth,
+      elementRef.value.offsetHeight
+    )
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = 2 // THREE.PCFSoftShadowMap
 
-    cameraControl = new OrbitControls(camera, renderer.domElement)
-    cameraControl.listenToKeyEvents(window)
-    cameraControl.keyPanSpeed = 50
+    if (cameraMoveable) {
+      cameraControl = new OrbitControls(camera, renderer.domElement)
+      cameraControl.listenToKeyEvents(window)
+      cameraControl.keyPanSpeed = 50
+      tweenHandler()
+    }
 
     // light
     let ambientLight = new THREE.AmbientLight(0xffffff)
@@ -93,12 +99,11 @@ function useScene(serverRef, initFunc, hostOption) {
     spotLight.position.set(0, 100, 100)
     spotLight.castShadow = true
     scene.add(spotLight)
-    tweenHandler()
 
     initFunc()
 
     // 將渲染出來的畫面放到網頁上的 DOM
-    serverRef.value.appendChild(renderer.domElement)
+    elementRef.value.appendChild(renderer.domElement)
   }
 
   const tweenHandler = () => {
@@ -141,7 +146,7 @@ function useScene(serverRef, initFunc, hostOption) {
           })
         }
         if (intersects[0].object.parent.name === 'blender') {
-          serverRef.value.classList.add('pointer')
+          elementRef.value.classList.add('pointer')
           actives = intersects[0].object.parent
           actives.children.forEach((child) => {
             if (child.material) {
@@ -149,7 +154,7 @@ function useScene(serverRef, initFunc, hostOption) {
             }
           })
         } else {
-          serverRef.value.classList.remove('pointer')
+          elementRef.value.classList.remove('pointer')
           actives = null
         }
       }
@@ -161,13 +166,13 @@ function useScene(serverRef, initFunc, hostOption) {
           }
         })
       }
-      serverRef.value.classList.remove('pointer')
+      elementRef.value.classList.remove('pointer')
       actives = null
     }
   }
 
   const clickCabinet = () => {
-    if (actives) {
+    if (actives && cameraMoveable) {
       target.x = actives.position.x
       target.y = actives.position.y + hostOption.hostHeight * 2
       target.z = actives.position.z
@@ -186,7 +191,9 @@ function useScene(serverRef, initFunc, hostOption) {
   }
 
   const render = () => {
-    cameraControl.update()
+    if (cameraMoveable) {
+      cameraControl.update()
+    }
     pointerHover()
     TWEEN.update()
     requestAnimationFrame(render)
