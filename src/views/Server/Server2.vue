@@ -1,10 +1,12 @@
 <template lang="pug">
-#Server(ref="serverRef")
+#Server
+  router-link(to="/edit") 到編輯頁
+  .threejs(ref="serverRef")
+  button(@click="backStart") 回到起始點
 </template>
 <script>
 import { ref } from 'vue'
 import data from '@mock/data'
-import * as dat from 'dat.gui'
 import useScene from '@/hooks/useScene'
 
 const planeWidth = 60 // 機房平面寬度
@@ -24,25 +26,17 @@ export default {
   name: 'server2',
   setup() {
     const serverRef = ref(null)
-    let gui
 
     const initFunc = () => {
       generateStructor()
-
-      let controls = new (function () {
-        this.backStart = backStart
-      })()
-
-      gui = new dat.GUI()
-      gui.add(controls, 'backStart')
     }
 
-    const { createPlane, createBlender, backStart } = useScene(
-      serverRef,
+    const { createPlane, createBlender, backStart } = useScene({
+      elementRef: serverRef,
       initFunc,
       hostOption,
-      cameraPosition
-    )
+      cameraPosition,
+    })
 
     const generateStructor = () => {
       const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
@@ -97,6 +91,7 @@ export default {
 
     return {
       serverRef,
+      backStart,
     }
   },
 }
@@ -104,6 +99,20 @@ export default {
 
 <style lang="sass" scoped>
 #Server
-  &.pointer
+  +size(100vw,100vh)
+  position: relative
+  a
+    position: absolute
+    top: 10px
+    left: 10px
+    color: #fff
+  button
+    position: absolute
+    top: 10px
+    right: 10px
     cursor: pointer
+  .threejs
+    +size(100%,100%)
+    &.pointer
+      cursor: pointer
 </style>

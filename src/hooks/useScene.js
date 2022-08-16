@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
+import { text } from '@/utils'
 
 const blenderLoader = async (modelUrl) => {
   return new Promise((resolve) => {
@@ -42,8 +43,8 @@ function useScene({
 
   const onPointerMove = (event) => {
     // 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+    pointer.x = (event.offsetX / elementRef.value.offsetWidth) * 2 - 1
+    pointer.y = -(event.offsetY / elementRef.value.offsetHeight) * 2 + 1
   }
 
   const backStart = () => {
@@ -205,13 +206,13 @@ function useScene({
   onMounted(() => {
     init()
     render()
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('click', clickCabinet)
+    elementRef.value.addEventListener('pointermove', onPointerMove)
+    elementRef.value.addEventListener('click', clickCabinet)
   })
 
   onBeforeUnmount(() => {
-    window.removeEventListener('pointermove', onPointerMove)
-    window.removeEventListener('click', clickCabinet)
+    elementRef.value.removeEventListener('pointermove', onPointerMove)
+    elementRef.value.removeEventListener('click', clickCabinet)
   })
 
   const createPlane = (row) => {
@@ -237,11 +238,17 @@ function useScene({
     scene.add(gltf)
   }
 
+  const createText = (message, position) => {
+    const word = new text(message, position)
+    scene.add(word.text)
+  }
+
   return {
     scene,
     createPlane,
     createBlender,
     backStart,
+    createText,
   }
 }
 

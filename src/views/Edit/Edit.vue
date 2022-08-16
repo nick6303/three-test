@@ -1,14 +1,25 @@
 <template lang="pug">
 #Edit
   .cabinets
-    .cabinet(v-for="item in data[1].cabinets") 
-
+    router-link(to="/") 回到預覽
+    el-table(:data="data[0].cabinets" border)
+      el-table-column(prop="cabinetName" label="機櫃名稱")
+      el-table-column(prop="x" label="X座標")
+      el-table-column(prop="z" label="Z座標")
+      el-table-column(label="功能")
+        template(#default="scope")
+          el-button(
+            @click="handleClick(scope.row)" 
+            type="text" 
+            size="small"
+          ) 編輯
   .threejs(ref="serverRef")
 </template>
 <script>
 import { ref } from 'vue'
 import data from '@mock/data'
 import useScene from '@/hooks/useScene'
+
 const planeWidth = 60 // 機房平面寬度
 const planeLong = 60 // 機房平面長度
 
@@ -26,14 +37,12 @@ export default {
   name: 'Edit',
   setup() {
     const serverRef = ref(null)
+
     const initFunc = () => {
       generateStructor()
     }
 
-    const {
-      createPlane,
-      // createBlender
-    } = useScene({
+    const { createPlane, createBlender } = useScene({
       elementRef: serverRef,
       initFunc,
       hostOption,
@@ -63,7 +72,7 @@ export default {
         return posi
       }
 
-      const house = data[1]
+      const house = data[0]
       const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
       createPlane({
         houseName: house.houseName,
@@ -73,23 +82,23 @@ export default {
         position: [planePosiX, 0, 0],
       })
 
-      // house.cabinets.forEach((item) => {
-      //   const cabinetPosiX =
-      //     item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
-      //   const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
+      house.cabinets.forEach((item) => {
+        const cabinetPosiX =
+          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
+        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
 
-      //   createBlender({
-      //     position: [cabinetPosiX, 0, cabinetPosiZ],
-      //     modelUrl: item.url,
-      //   })
+        createBlender({
+          position: [cabinetPosiX, -5, cabinetPosiZ],
+          modelUrl: item.url,
+        })
 
-      //   item.servers.forEach((item) => {
-      //     createBlender({
-      //       position: [cabinetPosiX, item.y, cabinetPosiZ],
-      //       modelUrl: 'glTF/server.glb',
-      //     })
-      //   })
-      // })
+        // item.servers.forEach((item) => {
+        //   createBlender({
+        //     position: [cabinetPosiX, item.y, cabinetPosiZ],
+        //     modelUrl: 'glTF/server.glb',
+        //   })
+        // })
+      })
     }
 
     return {
@@ -104,9 +113,19 @@ export default {
   display: flex
   +size(100vw,100vh)
   .cabinets
-    width: 300px
+    width: calc(100% - 100vh)
+    height: 100vh
+    padding: 30px 5px 0
+    position: relative
+    a
+      position: absolute
+      top: 0
+      left: 5px
+      display: block
+    :deep(.el-table)
+      +size(100%,calc(100% - 90px))
   .threejs
-    +size(calc(100% - 300px),100%)
+    +size(100vh,100%)
     canvas
       +size(100%,100%)
 </style>
