@@ -2,10 +2,55 @@
 #Edit
   .cabinets
     router-link(to="/") 回到預覽
-    el-table(:data="data[0].cabinets" border)
-      el-table-column(prop="cabinetName" label="機櫃名稱")
-      el-table-column(prop="x" label="X座標")
-      el-table-column(prop="z" label="Z座標")
+    .top
+      .row
+        p 機房
+        el-select(v-model="roomSelect")
+          el-option(
+            v-for="item in roomList"
+            :value="item.id"
+            :label="item.name"
+          )
+      el-popover(
+        placement="bottom"
+        trigger="manual"
+        :width="300"
+        popper-class="addForm"
+        v-model:visible="formOpen"
+      )
+        template(#reference)
+          el-button(
+            type="success" plain
+            @click="openAdd"
+          ) 新增機櫃
+        el-form
+          el-form-item(
+            label="機櫃型號"
+          )
+            el-select(
+              v-model="formData.rackmodel"
+              size="mini"
+            )
+              el-option(
+                v-for="item in rackList"
+                :label="item.name"
+                :value="item.id"
+              )
+          .btns
+            el-button(
+              type="danger" plain
+              size="mini"
+              @click="formOpen = false"
+            ) 取消
+            el-button(
+              type="success" plain
+              size="mini"
+              @click="addRack"
+            ) 確認
+    el-table(:data="currentRack" border)
+      el-table-column(prop="id" label="機櫃代號")
+      el-table-column(prop="rackmount_x" label="X座標")
+      el-table-column(prop="rackmount_z" label="Z座標")
       el-table-column(label="功能")
         template(#default="scope")
           el-button(
@@ -13,97 +58,97 @@
             type="text" 
             size="small"
           ) 編輯
-  .threejs(ref="serverRef")
+  //- Preview(
+  //-   v-if="roomSelect"
+  //-   :roomSelect="roomSelect"
+  //-   :rackData="currentRack"
+  //- )
 </template>
 <script>
-import { ref } from 'vue'
-import data from '@mock/data'
-import useScene from '@/hooks/useScene'
-
-const planeWidth = 60 // 機房平面寬度
-const planeLong = 60 // 機房平面長度
-
-// 主機伺服器參數
-const hostOption = {
-  hostLimit: 60, // 一個機櫃中最多幾台主機
-  hostWidth: 2, // 主機寬度
-  hostLong: 2, // 主機長度
-  hostHeight: 1, // 主機高度
-}
-
-const cameraPosition = [0, 40, 0] // 攝影機位置
+import { computed, onMounted, reactive, ref } from 'vue'
+import roomApi from '@api/dataCenter'
+import rackApi from '@api/rackModel'
+import rackMountApi from '@api/rackMount'
+import { Preview } from './components'
+import { ElMessage } from 'element-plus'
 
 export default {
   name: 'Edit',
+  components: {
+    Preview,
+  },
   setup() {
-    const serverRef = ref(null)
-
-    const initFunc = () => {
-      generateStructor()
-    }
-
-    const { createPlane, createBlender } = useScene({
-      elementRef: serverRef,
-      initFunc,
-      hostOption,
-      cameraPosition,
-      cameraMoveable: false,
+    const roomList = ref([])
+    const rackList = ref([])
+    const rackMountList = ref([])
+    const roomSelect = ref(null)
+    const formOpen = ref(false)
+    const formData = reactive({
+      rackmount_x: 0,
+      rackmount_y: 0,
+      rackmount_z: 0,
+      rackmount_json: {},
+      // datacenter: 0,
+      rackmodel: null,
     })
 
-    const generateStructor = () => {
-      const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
-        const middle = Math.ceil(dataLength / 2)
-        let direction = middle > i ? -1 : 1
-        let numb
-        let posi
-        if (dataLength % 2 === 1) {
-          numb = i + 1 - middle
-          posi = numb * (width + interval) + parentPosi
-        } else {
-          numb = i + 1 - middle
-          if (numb > 0) {
-            numb--
-          }
-          posi =
-            numb * (width + interval) +
-            ((width + interval) / 2) * direction +
-            parentPosi
-        }
-        return posi
+    const currentRack = computed(() => {
+      if (!roomSelect.value) {
+        return []
       }
 
-      const house = data[0]
-      const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
-      createPlane({
-        houseName: house.houseName,
-        url: house.url,
-        width: planeWidth,
-        long: planeLong,
-        position: [planePosiX, 0, 0],
+      return rackMountList.value.filter((item) => {
+        return item.datacenter === roomSelect.value
       })
+    })
 
-      house.cabinets.forEach((item) => {
-        const cabinetPosiX =
-          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
-        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
-
-        createBlender({
-          position: [cabinetPosiX, -5, cabinetPosiZ],
-          modelUrl: item.url,
+    const openAdd = () => {
+      if (roomSelect.value) {
+        formOpen.value = true
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '請先選擇機房',
         })
-
-        // item.servers.forEach((item) => {
-        //   createBlender({
-        //     position: [cabinetPosiX, item.y, cabinetPosiZ],
-        //     modelUrl: 'glTF/server.glb',
-        //   })
-        // })
-      })
+      }
     }
 
+    const addRack = async () => {
+      try {
+        const params = { ...formData, datacenter: roomSelect.value }
+        await rackMountApi.addItem(params)
+      } catch {
+        // pass
+      }
+    }
+
+    const getRoomList = async () => {
+      roomList.value = await roomApi.getList()
+    }
+
+    const getRackList = async () => {
+      rackList.value = await rackApi.getList()
+    }
+
+    const getRackMount = async () => {
+      rackMountList.value = await rackMountApi.getList()
+    }
+
+    onMounted(() => {
+      getRoomList()
+      getRackList()
+      getRackMount()
+    })
+
     return {
-      serverRef,
-      data,
+      roomSelect,
+      roomList,
+      rackList,
+      currentRack,
+      formOpen,
+      openAdd,
+      formData,
+      addRack,
     }
   },
 }
@@ -117,15 +162,28 @@ export default {
     height: 100vh
     padding: 30px 5px 0
     position: relative
+    .top
+      display: flex
+      margin: 0 0 10px
+      .row
+        align-items: center
+        p
+          margin: 0 5px 0 0
+      :deep(.el-button)
+        margin: 0 0 0 10px
     a
       position: absolute
       top: 0
       left: 5px
       display: block
     :deep(.el-table)
-      +size(100%,calc(100% - 90px))
-  .threejs
-    +size(100vh,100%)
-    canvas
-      +size(100%,100%)
+      +size(100%,calc(100% - 50px))
+</style>
+
+<style lang="sass">
+.addForm
+  .el-form-item
+    margin-bottom: 10px
+  .btns
+    +flex-center
 </style>
