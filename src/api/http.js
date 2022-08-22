@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { refreshToken } from '@/utils'
-import store from '@/store'
+// import store from '@/store'
 
 // let repeatFuntion
 
@@ -88,7 +88,7 @@ http.interceptors.response.use(
         }
 
         localStorage.clear()
-        store.dispatch('panels/clearAllPanels')
+        // store.dispatch('panels/clearAllPanels')
         router.push({ path: '/login' })
 
         if (isLiginPage) {
@@ -98,7 +98,7 @@ http.interceptors.response.use(
       case 403:
         // if(parten403.test(errorMsg.message)) {
         localStorage.clear()
-        store.dispatch('panels/clearAllPanels')
+        // store.dispatch('panels/clearAllPanels')
         router.push({ path: '/login' })
         // }
         break
