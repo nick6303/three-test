@@ -11,134 +11,83 @@
             :value="item.id"
             :label="item.name"
           )
-      el-popover(
-        placement="bottom"
-        trigger="manual"
-        :width="300"
-        popper-class="addForm"
-        v-model:visible="formOpen"
+      AddRackMount(
+        :roomSelect="roomSelect"
+        @getRackMount="getRackMount"
       )
-        template(#reference)
-          el-button(
-            type="success" plain
-            @click="openAdd"
-          ) 新增機櫃
-        el-form
-          el-form-item(
-            label="機櫃型號"
-          )
-            el-select(
-              v-model="formData.rackmodel"
-              size="mini"
-            )
-              el-option(
-                v-for="item in rackList"
-                :label="item.name"
-                :value="item.id"
-              )
-          .btns
-            el-button(
-              type="danger" plain
-              size="mini"
-              @click="formOpen = false"
-            ) 取消
-            el-button(
-              type="success" plain
-              size="mini"
-              @click="addRack"
-            ) 確認
-    el-table(:data="currentRack" border)
-      el-table-column(prop="id" label="機櫃代號")
-      el-table-column(prop="rackmount_x" label="X座標")
-      el-table-column(prop="rackmount_z" label="Z座標")
-      el-table-column(label="功能")
-        template(#default="scope")
-          el-button(
-            @click="handleClick(scope.row)" 
-            type="text" 
-            size="small"
-          ) 編輯
-  //- Preview(
-  //-   v-if="roomSelect"
-  //-   :roomSelect="roomSelect"
-  //-   :rackData="currentRack"
-  //- )
+    Table(
+      ref="tableRef"
+      :currentRack="currentRack"
+      :loading="loading"
+      :key="`${roomSelect}${timeStamp}`"
+      @getRackMount="getRackMount"
+    )
+  Preview(
+    v-if="roomSelect"
+    :key="`${roomSelect}${timeStamp}`"
+    :currentRoom="currentRoom"
+    :rackData="currentRack"
+    @selectItem="selectItem"
+  )
 </template>
 <script>
-import { computed, onMounted, reactive, ref } from 'vue'
-import roomApi from '@api/dataCenter'
-import rackApi from '@api/rackModel'
-import rackMountApi from '@api/rackMount'
-import { Preview } from './components'
-import { ElMessage } from 'element-plus'
+import { computed, ref } from 'vue'
+
+import { Preview, Table, AddRackMount } from './components'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Edit',
   components: {
     Preview,
+    Table,
+    AddRackMount,
   },
   setup() {
-    const roomList = ref([])
-    const rackList = ref([])
-    const rackMountList = ref([])
-    const roomSelect = ref(null)
+    const store = useStore()
+    const roomList = computed(() => store.state.roomList)
+    const rackList = computed(() => store.state.rackList)
+    const rackMountList = computed(() => store.state.rackMountList)
+
+    const tableRef = ref(null)
+    const timeStamp = ref('')
+
+    const roomSelect = ref(roomList.value[0].id)
     const formOpen = ref(false)
-    const formData = reactive({
-      rackmount_x: 0,
-      rackmount_y: 0,
-      rackmount_z: 0,
-      rackmount_json: {},
-      // datacenter: 0,
-      rackmodel: null,
-    })
+    const loading = ref(false)
 
     const currentRack = computed(() => {
       if (!roomSelect.value) {
         return []
       }
-
       return rackMountList.value.filter((item) => {
         return item.datacenter === roomSelect.value
       })
     })
 
-    const openAdd = () => {
-      if (roomSelect.value) {
-        formOpen.value = true
-      } else {
-        ElMessage({
-          type: 'error',
-          message: '請先選擇機房',
-        })
+    const currentRoom = computed(() => {
+      if (!roomSelect.value) {
+        return null
       }
-    }
+      return roomList.value.find((item) => item.id === roomSelect.value)
+    })
 
-    const addRack = async () => {
-      try {
-        const params = { ...formData, datacenter: roomSelect.value }
-        await rackMountApi.addItem(params)
-      } catch {
-        // pass
-      }
-    }
-
-    const getRoomList = async () => {
-      roomList.value = await roomApi.getList()
-    }
-
-    const getRackList = async () => {
-      rackList.value = await rackApi.getList()
+    const selectItem = (val) => {
+      const index = currentRack.value.findIndex((item) => item.id === val.name)
+      tableRef.value.setCurrent(index)
     }
 
     const getRackMount = async () => {
-      rackMountList.value = await rackMountApi.getList()
+      loading.value = true
+      try {
+        await store.dispatch('setRackMountList')
+        timeStamp.value = new Date().getTime()
+      } catch {
+        // pass
+      } finally {
+        loading.value = false
+      }
     }
-
-    onMounted(() => {
-      getRoomList()
-      getRackList()
-      getRackMount()
-    })
 
     return {
       roomSelect,
@@ -146,9 +95,12 @@ export default {
       rackList,
       currentRack,
       formOpen,
-      openAdd,
-      formData,
-      addRack,
+      getRackMount,
+      currentRoom,
+      timeStamp,
+      loading,
+      tableRef,
+      selectItem,
     }
   },
 }
@@ -177,7 +129,13 @@ export default {
       left: 5px
       display: block
     :deep(.el-table)
-      +size(100%,calc(100% - 50px))
+      +size(100%,calc(100% - 52px))
+      .el-button--mini
+        min-height: auto
+        padding: 5px 10px
+      .el-button+.el-button
+        margin-left: 0
+        margin-top: 5px
 </style>
 
 <style lang="sass">

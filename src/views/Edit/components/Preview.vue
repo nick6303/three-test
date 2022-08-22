@@ -2,9 +2,9 @@
 .Preview(ref="elementRef")
 </template>
 <script>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import useScene from '@/hooks/useScene'
-import data from '@mock/data'
+import { useStore } from 'vuex'
 
 const planeWidth = 60 // 機房平面寬度
 const planeLong = 60 // 機房平面長度
@@ -20,10 +20,22 @@ const hostOption = {
 const cameraPosition = [0, 40, 0] // 攝影機位置
 export default {
   name: 'Preview',
-  setup() {
+  props: {
+    currentRoom: Object,
+    rackData: Array,
+  },
+  setup(props, { emit }) {
+    const store = useStore()
+    const rackData = computed(() => (props ? props.rackData : []))
+    const currentRoom = computed(() => (props ? props.currentRoom : null))
+    const rackList = computed(() => store.state.rackList)
     const elementRef = ref(null)
     const initFunc = () => {
       generateStructor()
+    }
+
+    const clickfunc = (val) => {
+      emit('selectItem', val)
     }
 
     const { createPlane, createBlender } = useScene({
@@ -32,6 +44,7 @@ export default {
       hostOption,
       cameraPosition,
       cameraMoveable: false,
+      clickfunc,
     })
 
     const generateStructor = () => {
@@ -56,24 +69,30 @@ export default {
         return posi
       }
 
-      const house = data[0]
       const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
       createPlane({
-        houseName: house.houseName,
-        url: house.url,
+        houseName: currentRoom.value.name,
+        url: currentRoom.value.DataCenter_model,
         width: planeWidth,
         long: planeLong,
         position: [planePosiX, 0, 0],
       })
 
-      house.cabinets.forEach((item) => {
+      rackData.value.forEach((item) => {
         const cabinetPosiX =
-          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
-        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
+          item.rackmount_x +
+          planePosiX -
+          planeWidth / 2 +
+          hostOption.hostWidth / 2
+        const cabinetPosiZ =
+          planeLong / 2 - item.rackmount_z - hostOption.hostLong / 2
+
+        const rack = rackList.value.find((val) => val.id === item.rackmodel)
 
         createBlender({
           position: [cabinetPosiX, -5, cabinetPosiZ],
-          modelUrl: item.url,
+          modelUrl: rack.rackmount_model,
+          name: item.id,
         })
 
         // item.servers.forEach((item) => {
@@ -91,6 +110,8 @@ export default {
 <style lang="sass" scoped>
 .Preview
   +size(100vh,100%)
+  &.pointer
+    cursor: pointer
   canvas
     +size(100%,100%)
 </style>

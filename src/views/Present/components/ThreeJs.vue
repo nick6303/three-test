@@ -1,13 +1,12 @@
 <template lang="pug">
-#Server
-  router-link(to="/edit") 到編輯頁
-  .threejs(ref="serverRef")
-  button(@click="backStart") 回到起始點
+.threejs(
+  ref="serverRef"
+)
 </template>
 <script>
-import { ref } from 'vue'
-import data from '@mock/data'
 import useScene from '@/hooks/useScene'
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
 
 const planeWidth = 60 // 機房平面寬度
 const planeLong = 60 // 機房平面長度
@@ -23,14 +22,22 @@ const hostOption = {
 const cameraPosition = [0, 45, 45] // 攝影機位置
 
 export default {
-  name: 'server2',
-  setup() {
+  name: 'ThreeJs',
+  props: {
+    currentRack: Array,
+    currentRoom: Object,
+  },
+  setup(props) {
+    const store = useStore()
+    const rackList = computed(() => store.state.rackList)
+    const currentRack = computed(() => (props ? props.currentRack : []))
+    const currentRoom = computed(() => (props ? props.currentRoom : {}))
+
     const serverRef = ref(null)
 
     const initFunc = () => {
       generateStructor()
     }
-
     const { createPlane, createBlender, backStart } = useScene({
       elementRef: serverRef,
       initFunc,
@@ -60,59 +67,45 @@ export default {
         return posi
       }
 
-      const house = data[0]
       const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
       createPlane({
-        houseName: house.houseName,
-        url: house.url,
+        houseName: currentRoom.value.name,
+        url: currentRoom.value.DataCenter_model,
         width: planeWidth,
         long: planeLong,
         position: [planePosiX, 0, 0],
       })
 
-      house.cabinets.forEach((item) => {
+      currentRack.value.forEach((item) => {
         const cabinetPosiX =
-          item.x + planePosiX - planeWidth / 2 + hostOption.hostWidth / 2
-        const cabinetPosiZ = planeLong / 2 - item.z - hostOption.hostLong / 2
+          item.rackmount_x +
+          planePosiX -
+          planeWidth / 2 +
+          hostOption.hostWidth / 2
+        const cabinetPosiZ =
+          planeLong / 2 - item.rackmount_z - hostOption.hostLong / 2
+
+        const rack = rackList.value.find((val) => val.id === item.rackmodel)
 
         createBlender({
           position: [cabinetPosiX, 0, cabinetPosiZ],
-          modelUrl: item.url,
+          modelUrl: rack.rackmount_model,
+          name: item.id,
         })
 
-        item.servers.forEach((item) => {
-          createBlender({
-            position: [cabinetPosiX, item.y, cabinetPosiZ],
-            modelUrl: 'glTF/server.glb',
-          })
-        })
+        // item.servers.forEach((item) => {
+        //   createBlender({
+        //     position: [cabinetPosiX, item.y, cabinetPosiZ],
+        //     modelUrl: 'glTF/server.glb',
+        //   })
+        // })
       })
     }
 
     return {
-      serverRef,
       backStart,
+      serverRef,
     }
   },
 }
 </script>
-
-<style lang="sass" scoped>
-#Server
-  +size(100vw,100vh)
-  position: relative
-  a
-    position: absolute
-    top: 10px
-    left: 10px
-    color: #fff
-  button
-    position: absolute
-    top: 10px
-    right: 10px
-    cursor: pointer
-  .threejs
-    +size(100%,100%)
-    &.pointer
-      cursor: pointer
-</style>

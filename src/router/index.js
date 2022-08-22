@@ -3,8 +3,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    name: 'server',
-    component: () => import('@v/Server/Server2.vue'),
+    name: 'Present',
+    component: () => import('@v/Present/Present.vue'),
   },
   {
     path: '/edit',

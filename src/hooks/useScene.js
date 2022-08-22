@@ -20,6 +20,7 @@ function useScene({
   hostOption,
   cameraPosition,
   cameraMoveable = true,
+  clickfunc,
 }) {
   let cameraControl, camera, renderer, actives
   let targetTween, positionTween
@@ -146,7 +147,7 @@ function useScene({
             }
           })
         }
-        if (intersects[0].object.parent.name === 'blender') {
+        if (intersects[0].object.parent.type === 'blender') {
           elementRef.value.classList.add('pointer')
           actives = intersects[0].object.parent
           actives.children.forEach((child) => {
@@ -155,7 +156,9 @@ function useScene({
             }
           })
         } else {
-          elementRef.value.classList.remove('pointer')
+          if (elementRef.value) {
+            elementRef.value.classList.remove('pointer')
+          }
           actives = null
         }
       }
@@ -167,27 +170,34 @@ function useScene({
           }
         })
       }
-      elementRef.value.classList.remove('pointer')
+      if (elementRef.value) {
+        elementRef.value.classList.remove('pointer')
+      }
       actives = null
     }
   }
 
   const clickCabinet = () => {
-    if (actives && cameraMoveable) {
-      target.x = actives.position.x
-      target.y = actives.position.y + hostOption.hostHeight * 2
-      target.z = actives.position.z
-      position.x = actives.position.x
-      position.y = actives.position.y + hostOption.hostHeight * 2
-      position.z = actives.position.z + hostOption.hostLong * 3
-      targetStart.x = cameraControl.target.x
-      targetStart.y = cameraControl.target.y
-      targetStart.z = cameraControl.target.z
-      positionStart.x = cameraControl.object.position.x
-      positionStart.y = cameraControl.object.position.y
-      positionStart.z = cameraControl.object.position.z
-      targetTween.start()
-      positionTween.start()
+    if (actives) {
+      if (cameraMoveable) {
+        target.x = actives.position.x
+        target.y = actives.position.y + hostOption.hostHeight * 2
+        target.z = actives.position.z
+        position.x = actives.position.x
+        position.y = actives.position.y + hostOption.hostHeight * 2
+        position.z = actives.position.z + hostOption.hostLong * 3
+        targetStart.x = cameraControl.target.x
+        targetStart.y = cameraControl.target.y
+        targetStart.z = cameraControl.target.z
+        positionStart.x = cameraControl.object.position.x
+        positionStart.y = cameraControl.object.position.y
+        positionStart.z = cameraControl.object.position.z
+        targetTween.start()
+        positionTween.start()
+      }
+      if (clickfunc) {
+        clickfunc(actives)
+      }
     }
   }
 
@@ -222,19 +232,22 @@ function useScene({
       const y = 0
       const z = row.position[2]
       gltf.scene.position.set(x, y, z)
-      gltf.scene.name = 'floor'
+      gltf.scene.type = 'floor'
 
       scene.add(gltf.scene)
     })
   }
 
-  const createBlender = async ({ position, modelUrl }) => {
+  const createBlender = async ({ position, modelUrl, name }) => {
     const gltf = await blenderLoader(modelUrl)
     const x = position[0]
     const y = position[1]
     const z = position[2]
     gltf.position.set(x, y, z)
-    gltf.name = 'blender'
+    gltf.type = 'blender'
+    if (name) {
+      gltf.name = name
+    }
     scene.add(gltf)
   }
 
