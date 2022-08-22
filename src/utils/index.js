@@ -150,3 +150,13 @@ export class text {
     })
   }
 }
+
+export const removeEmpty = (params) => {
+  const tem = params
+  Object.keys(params).forEach((key) => {
+    if (params[key] === null || params[key] === undefined) {
+      delete tem[key]
+    }
+  })
+  return tem
+}

@@ -2,6 +2,18 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
   publicPath: isProduction ? '/mywork/threejs/' : '/',
+  devServer: {
+    proxy: {
+      '/esmanageapi/': {
+        target: 'http://10.11.233.213:8000/',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/esmanageapi/': '',
+        },
+      },
+    },
+  },
   chainWebpack: (config) => {
     config.plugin('html').tap((args) => {
       args[0].title = 'Three js 測試'
