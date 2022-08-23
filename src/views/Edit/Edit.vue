@@ -1,7 +1,7 @@
 <template lang="pug">
 #Edit
   .cabinets
-    router-link(to="/") 回到預覽
+    //- router-link(to="/") 回到預覽
     .top
       .row
         p 機房

@@ -1,7 +1,6 @@
 <template lang="pug">
 #Server
-  router-link(to="/edit") 到編輯頁
-  
+  //- router-link(to="/edit") 到編輯頁
   ThreeJs(
     ref="threeRef"
     :key="`${roomSelect}`"
