@@ -21,6 +21,7 @@ function useScene({
   cameraPosition,
   cameraMoveable = true,
   clickfunc,
+  addGrid = false,
 }) {
   let cameraControl, camera, renderer, actives
   let targetTween, positionTween
@@ -101,6 +102,15 @@ function useScene({
     spotLight.position.set(0, 100, 100)
     spotLight.castShadow = true
     scene.add(spotLight)
+
+    if (addGrid) {
+      // 加入格線
+      // const gridHelper = new THREE.GridHelper(120, 120, 0x0000ff, 0x808080)
+      // gridHelper.position.x = 0
+      // gridHelper.position.y = 0.1
+      // gridHelper.position.z = 0
+      // scene.add(gridHelper)
+    }
 
     initFunc()
 
@@ -226,14 +236,14 @@ function useScene({
   })
 
   const createPlane = (row) => {
+    const x = row.position[0]
+    const y = 0
+    const z = row.position[2]
+
     const loader = new GLTFLoader()
     loader.load(row.url, function (gltf) {
-      const x = row.position[0]
-      const y = 0
-      const z = row.position[2]
       gltf.scene.position.set(x, y, z)
       gltf.scene.type = 'floor'
-
       scene.add(gltf.scene)
     })
   }

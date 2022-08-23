@@ -27,7 +27,7 @@ export default {
   setup(props, { emit }) {
     const store = useStore()
     const rackData = computed(() => (props ? props.rackData : []))
-    const currentRoom = computed(() => (props ? props.currentRoom : null))
+    const currentRoom = computed(() => (props ? props.currentRoom : {}))
     const rackList = computed(() => store.state.rackList)
     const elementRef = ref(null)
     const initFunc = () => {
@@ -45,45 +45,43 @@ export default {
       cameraPosition,
       cameraMoveable: false,
       clickfunc,
+      addGrid: true,
     })
 
     const generateStructor = () => {
-      const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
-        const middle = Math.ceil(dataLength / 2)
-        let direction = middle > i ? -1 : 1
-        let numb
-        let posi
-        if (dataLength % 2 === 1) {
-          numb = i + 1 - middle
-          posi = numb * (width + interval) + parentPosi
-        } else {
-          numb = i + 1 - middle
-          if (numb > 0) {
-            numb--
-          }
-          posi =
-            numb * (width + interval) +
-            ((width + interval) / 2) * direction +
-            parentPosi
-        }
-        return posi
-      }
+      // const offsetCenter = (dataLength, parentPosi, i, width, interval) => {
+      //   const middle = Math.ceil(dataLength / 2)
+      //   let direction = middle > i ? -1 : 1
+      //   let numb
+      //   let posi
+      //   if (dataLength % 2 === 1) {
+      //     numb = i + 1 - middle
+      //     posi = numb * (width + interval) + parentPosi
+      //   } else {
+      //     numb = i + 1 - middle
+      //     if (numb > 0) {
+      //       numb--
+      //     }
+      //     posi =
+      //       numb * (width + interval) +
+      //       ((width + interval) / 2) * direction +
+      //       parentPosi
+      //   }
+      //   return posi
+      // }
 
-      const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
+      // const planePosiX = offsetCenter(1, 0, 0, planeWidth, 0.5)
       createPlane({
         houseName: currentRoom.value.name,
         url: currentRoom.value.DataCenter_model,
         width: planeWidth,
         long: planeLong,
-        position: [planePosiX, 0, 0],
+        position: [0, 0, 0],
       })
 
       rackData.value.forEach((item) => {
         const cabinetPosiX =
-          item.rackmount_x +
-          planePosiX -
-          planeWidth / 2 +
-          hostOption.hostWidth / 2
+          item.rackmount_x + 0 - planeWidth / 2 + hostOption.hostWidth / 2
         const cabinetPosiZ =
           planeLong / 2 - item.rackmount_z - hostOption.hostLong / 2
 

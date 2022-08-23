@@ -4,7 +4,7 @@ main
 </template>
 
 <script>
-import { computed, watch, onBeforeMount, onMounted } from 'vue'
+import { computed, watch, onBeforeMount } from 'vue'
 import router from '@/router'
 import { useStore } from 'vuex'
 
@@ -26,15 +26,13 @@ export default {
       setToken(val)
     })
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
       setToken(access_token.value)
+      await store.dispatch('setRoomList')
+      await store.dispatch('setRackList')
+      await store.dispatch('setRackMountList')
     })
 
-    onMounted(() => {
-      store.dispatch('setRoomList')
-      store.dispatch('setRackList')
-      store.dispatch('setRackMountList')
-    })
     return {}
   },
 }

@@ -23,7 +23,7 @@
       @getRackMount="getRackMount"
     )
   Preview(
-    v-if="roomSelect"
+    v-if="currentRoom"
     :key="`${roomSelect}${timeStamp}`"
     :currentRoom="currentRoom"
     :rackData="currentRack"
@@ -52,7 +52,7 @@ export default {
     const tableRef = ref(null)
     const timeStamp = ref('')
 
-    const roomSelect = ref(roomList.value[0].id)
+    const roomSelect = ref(roomList.value[0] ? roomList.value[0].id : 0)
     const formOpen = ref(false)
     const loading = ref(false)
 

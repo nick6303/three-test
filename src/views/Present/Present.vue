@@ -2,6 +2,7 @@
 #Server
   //- router-link(to="/edit") 到編輯頁
   ThreeJs(
+    v-if="currentRoom"
     ref="threeRef"
     :key="`${roomSelect}`"
     :currentRack="currentRack"
@@ -37,7 +38,7 @@ export default {
     const roomList = computed(() => store.state.roomList)
     const rackMountList = computed(() => store.state.rackMountList)
 
-    const roomSelect = ref(roomList.value[0].id)
+    const roomSelect = ref(roomList.value[0] ? roomList.value[0].id : 0)
     const threeRef = ref(null)
 
     const currentRack = computed(() => {
