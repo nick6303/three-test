@@ -2,7 +2,7 @@
 #Server
   //- router-link(to="/edit") 到編輯頁
   ThreeJs(
-    v-if="currentRoom"
+    v-if="currentRoom && currentRack.length !== 0"
     ref="threeRef"
     :key="`${roomSelect}`"
     :currentRack="currentRack"
@@ -24,9 +24,9 @@
     ) 回到起始點
 </template>
 <script>
-import { ref, computed } from 'vue'
-import { useStore } from 'vuex'
+import { ref, computed, onMounted } from 'vue'
 import { ThreeJs } from './components'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Present',
@@ -38,7 +38,7 @@ export default {
     const roomList = computed(() => store.state.roomList)
     const rackMountList = computed(() => store.state.rackMountList)
 
-    const roomSelect = ref(roomList.value[0] ? roomList.value[0].id : 0)
+    const roomSelect = ref(undefined)
     const threeRef = ref(null)
 
     const currentRack = computed(() => {
@@ -61,6 +61,10 @@ export default {
     const backStart = () => {
       threeRef.value.backStart()
     }
+
+    onMounted(() => {
+      roomSelect.value = roomList.value[0] ? roomList.value[0].id : undefined
+    })
 
     return {
       roomSelect,

@@ -109,19 +109,18 @@ import rackMountApi from '@api/rackMount'
 import { reactive, ref } from '@vue/reactivity'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { computed } from '@vue/runtime-core'
-import { useStore } from 'vuex'
 
 export default {
   name: 'Table',
   props: {
     currentRack: Array,
     loading: Boolean,
+    rackList: Array,
   },
   emits: ['getRackMount'],
   setup(props, { emit }) {
-    const store = useStore()
     const currentRack = computed(() => (props ? props.currentRack : []))
-    const rackList = computed(() => store.state.rackList)
+    const rackList = computed(() => (props ? props.rackList : []))
     const tableRef = ref(null)
     const dialogVisible = ref(false)
     const editForm = ref(null)
@@ -215,7 +214,6 @@ export default {
       rules,
       tableRef,
       setCurrent,
-      rackList,
       getRackName,
     }
   },

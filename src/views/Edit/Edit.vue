@@ -13,25 +13,28 @@
           )
       AddRackMount(
         :roomSelect="roomSelect"
+        :rackList="rackList"
         @getRackMount="getRackMount"
       )
     Table(
       ref="tableRef"
       :currentRack="currentRack"
       :loading="loading"
+      :rackList="rackList"
       :key="`${roomSelect}${timeStamp}`"
       @getRackMount="getRackMount"
     )
   Preview(
-    v-if="currentRoom"
+    v-if="currentRoom && currentRack.length !== 0"
     :key="`${roomSelect}${timeStamp}`"
     :currentRoom="currentRoom"
     :rackData="currentRack"
+    :rackList="rackList"
     @selectItem="selectItem"
   )
 </template>
 <script>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { Preview, Table, AddRackMount } from './components'
 import { useStore } from 'vuex'
@@ -52,7 +55,7 @@ export default {
     const tableRef = ref(null)
     const timeStamp = ref('')
 
-    const roomSelect = ref(roomList.value[0] ? roomList.value[0].id : 0)
+    const roomSelect = ref(undefined)
     const formOpen = ref(false)
     const loading = ref(false)
 
@@ -88,6 +91,10 @@ export default {
         loading.value = false
       }
     }
+
+    onMounted(() => {
+      roomSelect.value = roomList.value[0] ? roomList.value[0].id : undefined
+    })
 
     return {
       roomSelect,

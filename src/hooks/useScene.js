@@ -105,11 +105,11 @@ function useScene({
 
     if (addGrid) {
       // 加入格線
-      // const gridHelper = new THREE.GridHelper(120, 120, 0x0000ff, 0x808080)
-      // gridHelper.position.x = 0
-      // gridHelper.position.y = 0.1
-      // gridHelper.position.z = 0
-      // scene.add(gridHelper)
+      const gridHelper = new THREE.GridHelper(120, 120, 0x0000ff, 0x808080)
+      gridHelper.position.x = 0
+      gridHelper.position.y = 0.1
+      gridHelper.position.z = 0
+      scene.add(gridHelper)
     }
 
     initFunc()

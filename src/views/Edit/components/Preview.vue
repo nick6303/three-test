@@ -4,7 +4,6 @@
 <script>
 import { computed, ref } from 'vue'
 import useScene from '@/hooks/useScene'
-import { useStore } from 'vuex'
 
 const planeWidth = 60 // 機房平面寬度
 const planeLong = 60 // 機房平面長度
@@ -23,12 +22,12 @@ export default {
   props: {
     currentRoom: Object,
     rackData: Array,
+    rackList: Array,
   },
   setup(props, { emit }) {
-    const store = useStore()
     const rackData = computed(() => (props ? props.rackData : []))
     const currentRoom = computed(() => (props ? props.currentRoom : {}))
-    const rackList = computed(() => store.state.rackList)
+    const rackList = computed(() => (props ? props.rackList : []))
     const elementRef = ref(null)
     const initFunc = () => {
       generateStructor()

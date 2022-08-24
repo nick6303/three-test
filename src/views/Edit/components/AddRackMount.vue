@@ -60,18 +60,16 @@ el-popover(
 import { computed, ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import rackMountApi from '@api/rackMount'
-import { useStore } from 'vuex'
 
 export default {
   name: 'AddRackMount',
   props: {
     roomSelect: Number,
+    rackList: Array,
   },
   emits: ['getRackMount'],
   setup(props, { emit }) {
-    const store = useStore()
     const roomSelect = computed(() => (props ? props.roomSelect : null))
-    const rackList = computed(() => store.state.rackList)
     const formOpen = ref(false)
     const formData = reactive({
       rackmount_x: 0,
@@ -124,7 +122,6 @@ export default {
       formOpen,
       addRack,
       formData,
-      rackList,
       rules,
     }
   },
