@@ -71,6 +71,21 @@ const routes = [
     name: 'shoes',
     component: () => import('@v/Shoes/Shoes.vue'),
   },
+  {
+    path: '/test1',
+    name: 'test1',
+    component: () => import('@v/test1/Test.vue'),
+  },
+  {
+    path: '/test2',
+    name: 'test2',
+    component: () => import('@v/test2/Test2.vue'),
+  },
+  {
+    path: '/test3',
+    name: 'test3',
+    component: () => import('@v/test3/Test3.vue'),
+  },
 ]
 
 export const router = createRouter({

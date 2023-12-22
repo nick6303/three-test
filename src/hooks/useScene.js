@@ -2,7 +2,7 @@ import { onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
+import TWEEN from '@tweenjs/tween.js'
 import { text } from '@/utils'
 
 const blenderLoader = async (modelUrl) => {

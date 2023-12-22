@@ -7,7 +7,7 @@ import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js'
+import TWEEN from '@tweenjs/tween.js'
 import * as dat from 'dat.gui'
 
 class Creeper {

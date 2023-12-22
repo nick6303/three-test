@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^21.0.0",
     "axios": "^0.27.2",
     "core-js": "^3.6.5",
     "dat.gui": "^0.7.7",
@@ -19,7 +20,7 @@
     "pug-plain-loader": "^1.1.0",
     "sass": "^1.49.7",
     "sass-loader": "^10.1.1",
-    "three": "^0.137.5",
+    "three": "^0.159.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
