@@ -4,29 +4,26 @@
 <script>
 import { onMounted } from 'vue'
 import * as THREE from 'three'
-// import Stats from 'three/examples/jsm/libs/stats.module'
+import Stats from 'three/examples/jsm/libs/stats.module'
 
 // import { GUI } from 'dat.gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-// import LineMaterial from 'three/examples/jsm/lines/LineMaterial'
 // import Wireframe from 'three/examples/jsm/lines/Wireframe'
-// import WireframeGeometry2 from 'three/examples/jsm/lines/WireframeGeometry2'
 
 export default {
   name: 'testPage2',
   setup() {
     let renderer, camera, controls, scene
-    // let wireframe
-    // let wireframe1
-    // let matLine
-    // , matLineBasic, matLineDashed
-    // let stats
+    let wireframe, wireframe1
+    let matLine, matLineBasic
+    // , matLineDashed
+    let stats
     // let gui
 
     // viewport
-    // let insetWidth
-    // let insetHeight
+    let insetWidth
+    let insetHeight
 
     function init() {
       renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -52,59 +49,58 @@ export default {
     }
 
     const createMatal = () => {
-      // let geo = new THREE.IcosahedronGeometry(20, 1)
-      // const geometry = new WireframeGeometry2(geo)
-      // matLine = new LineMaterial({
-      //   color: 0x4080ff,
-      //   linewidth: 5,
-      //   dashed: false,
+      let geo = new THREE.IcosahedronGeometry(20, 1)
+      const geometry = new THREE.WireframeGeometry(geo)
+      matLine = new THREE.LineBasicMaterial({
+        color: 0x4080ff,
+        linewidth: 5,
+      })
+      wireframe = new THREE.LineSegments(geometry, matLine)
+      wireframe.computeLineDistances()
+      wireframe.scale.set(1, 1, 1)
+      scene.add(wireframe)
+      geo = new THREE.WireframeGeometry(geo)
+      matLineBasic = new THREE.LineBasicMaterial({ color: 0x4080ff })
+      // matLineDashed = new THREE.LineDashedMaterial({
+      //   scale: 2,
+      //   dashSize: 1,
+      //   gapSize: 1,
       // })
-      // wireframe = new Wireframe(geometry, matLine)
-      // wireframe.computeLineDistances()
-      // wireframe.scale.set(1, 1, 1)
-      // scene.add(wireframe)
-      //   geo = new THREE.WireframeGeometry(geo)
-      //   matLineBasic = new THREE.LineBasicMaterial({ color: 0x4080ff })
-      //   matLineDashed = new THREE.LineDashedMaterial({
-      //     scale: 2,
-      //     dashSize: 1,
-      //     gapSize: 1,
-      //   })
-      //   wireframe1 = new THREE.LineSegments(geo, matLineBasic)
-      //   wireframe1.computeLineDistances()
-      //   wireframe1.visible = false
-      //   scene.add(wireframe1)
-      //   window.addEventListener('resize', onWindowResize)
-      //   onWindowResize()
-      //   stats = new Stats()
-      //   document.body.appendChild(stats.dom)
+      wireframe1 = new THREE.LineSegments(geo, matLineBasic)
+      wireframe1.computeLineDistances()
+      wireframe1.visible = false
+      scene.add(wireframe1)
+      window.addEventListener('resize', onWindowResize)
+      onWindowResize()
+      stats = new Stats()
+      document.body.appendChild(stats.dom)
       // initGui()
     }
 
-    // function onWindowResize() {
-    //   camera.aspect = window.innerWidth / window.innerHeight
-    //   camera.updateProjectionMatrix()
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
 
-    //   renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setSize(window.innerWidth, window.innerHeight)
 
-    //   insetWidth = window.innerHeight / 4 // square
-    //   insetHeight = window.innerHeight / 4
-    // }
+      insetWidth = window.innerHeight / 4 // square
+      insetHeight = window.innerHeight / 4
+    }
 
     function animate() {
-      //   requestAnimationFrame(animate)
-      //   stats.update()
-      //   renderer.setClearColor(0x000000, 0)
-      //   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight)
+      requestAnimationFrame(animate)
+      stats.update()
+      renderer.setClearColor(0x000000, 0)
+      renderer.setViewport(0, 0, window.innerWidth, window.innerHeight)
       //   matLine.resolution.set(window.innerWidth, window.innerHeight)
       renderer.render(scene, camera)
-      //   renderer.setClearColor(0x222222, 1)
-      //   renderer.clearDepth()
-      //   renderer.setScissorTest(true)
-      //   renderer.setScissor(20, 20, insetWidth, insetHeight)
-      //   renderer.setViewport(20, 20, insetWidth, insetHeight)
-      //   matLine.resolution.set(insetWidth, insetHeight)
-      //   renderer.setScissorTest(false)
+      renderer.setClearColor(0x222222, 1)
+      renderer.clearDepth()
+      renderer.setScissorTest(true)
+      renderer.setScissor(20, 20, insetWidth, insetHeight)
+      renderer.setViewport(20, 20, insetWidth, insetHeight)
+      // matLine.resolution.set(insetWidth, insetHeight)
+      renderer.setScissorTest(false)
     }
 
     // //
