@@ -2,108 +2,200 @@
 .testPage2
 </template>
 <script>
-import * as THREE from 'three'
 import { onMounted } from 'vue'
+import * as THREE from 'three'
+// import Stats from 'three/examples/jsm/libs/stats.module'
+
+// import { GUI } from 'dat.gui'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+
+// import LineMaterial from 'three/examples/jsm/lines/LineMaterial'
+// import Wireframe from 'three/examples/jsm/lines/Wireframe'
+// import WireframeGeometry2 from 'three/examples/jsm/lines/WireframeGeometry2'
 
 export default {
   name: 'testPage2',
   setup() {
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    )
-    const renderer = new THREE.WebGLRenderer()
+    let renderer, camera, controls, scene
+    // let wireframe
+    // let wireframe1
+    // let matLine
+    // , matLineBasic, matLineDashed
+    // let stats
+    // let gui
 
-    /*
-  In addition to creating the renderer instance, we also need to set the size at which we want it to render our app.
-  It's a good idea to use the width and height of the area we want to fill with our game
-  - in this case, the width and height of the browser window. For performance intensive games, you can also give setSize smaller values,
-  like window.innerWidth/2 and window.innerHeight/2, for half the resolution.
-  This does not mean that the game will only fill half the window, but rather look a bit blurry and scaled up.
+    // viewport
+    // let insetWidth
+    // let insetHeight
 
-  Last but not least, we add the renderer element to our HTML document.
-  This is a <canvas> element the renderer uses to display the scene to us.
-  */
+    function init() {
+      renderer = new THREE.WebGLRenderer({ antialias: true })
+      renderer.setPixelRatio(window.devicePixelRatio)
+      renderer.setClearColor(0x000000, 0.0)
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      document.body.appendChild(renderer.domElement)
 
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    document.body.appendChild(renderer.domElement)
+      scene = new THREE.Scene()
 
-    /* Create Lights: PointLight / SpotLight etc.*/
-    const spotLight = new THREE.SpotLight(0xffffff)
-    spotLight.position.set(100, 100, 100)
-    spotLight.castShadow = true //If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.
-    spotLight.shadowMapWidth = 1024
-    spotLight.shadowMapHeight = 1024
-    spotLight.shadowCameraNear = 500
-    spotLight.shadowCameraFar = 4000
-    spotLight.shadowCameraFov = 30
-    scene.add(spotLight)
+      camera = new THREE.PerspectiveCamera(
+        40,
+        window.innerWidth / window.innerHeight,
+        1,
+        1000
+      )
+      camera.position.set(-50, 0, 50)
 
-    /* Create Material */
-    function Mat() {
-      const material = new THREE.MeshPhongMaterial({
-        color: new THREE.Color('rgb(35,35,213)'), //Diffuse color of the material
-        emissive: new THREE.Color('rgb(64,128,255)'), //Emissive(light) color of the material, essentially a solid color unaffected by other lighting. Default is black.
-        specular: new THREE.Color(
-          'rgb(93,195,255)'
-        ) /*Specular color of the material, i.e., how shiny the material is and the color of its shine.
-        Setting this the same color as the diffuse value (times some intensity) makes the material more metallic-looking;
-        setting this to some gray makes the material look more plastic. Default is dark gray.*/,
-        shininess: 1, //How shiny the specular highlight is; a higher value gives a sharper highlight. Default is 30.
-        shading: THREE.FlatShading, //How the triangles of a curved surface are rendered: THREE.SmoothShading, THREE.FlatShading, THREE.NoShading
-        wireframe: 1, //THREE.Math.randInt(0,1)
-        transparent: 1,
-        opacity: 0.15, //THREE.Math.randFloat(0,1)
-      })
-      return material
+      controls = new OrbitControls(camera, renderer.domElement)
+      controls.minDistance = 10
+      controls.maxDistance = 500
+      createMatal()
     }
 
-    /* Create Geometry */
-    const geometry = new THREE.SphereGeometry(
-      50,
-      20,
-      20,
-      0,
-      Math.PI * 2,
-      0,
-      Math.PI
-    )
-    // SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+    const createMatal = () => {
+      // let geo = new THREE.IcosahedronGeometry(20, 1)
+      // const geometry = new WireframeGeometry2(geo)
+      // matLine = new LineMaterial({
+      //   color: 0x4080ff,
+      //   linewidth: 5,
+      //   dashed: false,
+      // })
+      // wireframe = new Wireframe(geometry, matLine)
+      // wireframe.computeLineDistances()
+      // wireframe.scale.set(1, 1, 1)
+      // scene.add(wireframe)
+      //   geo = new THREE.WireframeGeometry(geo)
+      //   matLineBasic = new THREE.LineBasicMaterial({ color: 0x4080ff })
+      //   matLineDashed = new THREE.LineDashedMaterial({
+      //     scale: 2,
+      //     dashSize: 1,
+      //     gapSize: 1,
+      //   })
+      //   wireframe1 = new THREE.LineSegments(geo, matLineBasic)
+      //   wireframe1.computeLineDistances()
+      //   wireframe1.visible = false
+      //   scene.add(wireframe1)
+      //   window.addEventListener('resize', onWindowResize)
+      //   onWindowResize()
+      //   stats = new Stats()
+      //   document.body.appendChild(stats.dom)
+      // initGui()
+    }
 
-    /* Create Earth Sphere*/
-    const earth = new THREE.Mesh(geometry, Mat())
+    // function onWindowResize() {
+    //   camera.aspect = window.innerWidth / window.innerHeight
+    //   camera.updateProjectionMatrix()
 
-    /*
-      var numSphere = 30;
-      var tabSphere = [];
-      for(var i=0: i<numSphere; i++){
-        tabShpere.push(new Sphere(i));
-        scene.add(tabSphere[i].b);
-      }
-    */
+    //   renderer.setSize(window.innerWidth, window.innerHeight)
 
-    scene.add(earth)
+    //   insetWidth = window.innerHeight / 4 // square
+    //   insetHeight = window.innerHeight / 4
+    // }
 
-    camera.position.z = 90
-
-    /*
-      This will create a loop that causes the renderer to draw the scene 60 times per second.
-      If you're new to writing games in the browser, you might say "why don't we just create a setInterval?
-      The thing is - we could, but requestAnimationFrame has a number of advantages.
-      Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.
-    */
-    function render() {
-      requestAnimationFrame(render)
-      earth.rotation.x += 0.01
-      earth.rotation.y += 0.01
+    function animate() {
+      //   requestAnimationFrame(animate)
+      //   stats.update()
+      //   renderer.setClearColor(0x000000, 0)
+      //   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight)
+      //   matLine.resolution.set(window.innerWidth, window.innerHeight)
       renderer.render(scene, camera)
+      //   renderer.setClearColor(0x222222, 1)
+      //   renderer.clearDepth()
+      //   renderer.setScissorTest(true)
+      //   renderer.setScissor(20, 20, insetWidth, insetHeight)
+      //   renderer.setViewport(20, 20, insetWidth, insetHeight)
+      //   matLine.resolution.set(insetWidth, insetHeight)
+      //   renderer.setScissorTest(false)
     }
+
+    // //
+
+    // function initGui() {
+    //   gui = new GUI()
+
+    //   const param = {
+    //     'line type': 0,
+    //     'width (px)': 5,
+    //     dashed: false,
+    //     'dash scale': 1,
+    //     'dash / gap': 1,
+    //   }
+
+    //   gui
+    //     .add(param, 'line type', { LineGeometry: 0, 'gl.LINE': 1 })
+    //     .onChange(function (val) {
+    //       switch (val) {
+    //         case 0:
+    //           wireframe.visible = true
+
+    //           wireframe1.visible = false
+
+    //           break
+
+    //         case 1:
+    //           wireframe.visible = false
+
+    //           wireframe1.visible = true
+
+    //           break
+    //       }
+    //     })
+
+    //   gui.add(param, 'width (px)', 1, 10).onChange(function (val) {
+    //     matLine.linewidth = val
+    //   })
+
+    //   gui.add(param, 'dashed').onChange(function (val) {
+    //     matLine.dashed = val
+
+    //     if (val) matLine.defines.USE_DASH = ''
+    //     else delete matLine.defines.USE_DASH
+    //     matLine.needsUpdate = true
+
+    //     wireframe1.material = val ? matLineDashed : matLineBasic
+    //   })
+
+    //   gui.add(param, 'dash scale', 0.5, 1, 0.1).onChange(function (val) {
+    //     matLine.dashScale = val
+    //     matLineDashed.scale = val
+    //   })
+
+    //   gui
+    //     .add(param, 'dash / gap', { '2 : 1': 0, '1 : 1': 1, '1 : 2': 2 })
+    //     .onChange(function (val) {
+    //       switch (val) {
+    //         case 0:
+    //           matLine.dashSize = 2
+    //           matLine.gapSize = 1
+
+    //           matLineDashed.dashSize = 2
+    //           matLineDashed.gapSize = 1
+
+    //           break
+
+    //         case 1:
+    //           matLine.dashSize = 1
+    //           matLine.gapSize = 1
+
+    //           matLineDashed.dashSize = 1
+    //           matLineDashed.gapSize = 1
+
+    //           break
+
+    //         case 2:
+    //           matLine.dashSize = 1
+    //           matLine.gapSize = 2
+
+    //           matLineDashed.dashSize = 1
+    //           matLineDashed.gapSize = 2
+
+    //           break
+    //       }
+    //     })
+    // }
 
     onMounted(() => {
-      render()
+      init()
+      animate()
     })
     return {}
   },

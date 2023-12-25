@@ -81,11 +81,6 @@ const routes = [
     name: 'test2',
     component: () => import('@v/test2/Test2.vue'),
   },
-  {
-    path: '/test3',
-    name: 'test3',
-    component: () => import('@v/test3/Test3.vue'),
-  },
 ]
 
 export const router = createRouter({
