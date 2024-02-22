@@ -103,7 +103,7 @@ export default {
     const init = () => {
       scene = new THREE.Scene()
 
-      // 相機設定與 OrbitControls
+      // 相機設定與 OrbitControls
       camera = new THREE.PerspectiveCamera(
         60,
         window.innerWidth / window.innerHeight,
@@ -129,7 +129,7 @@ export default {
       cameraControl.dampingFactor = 0.25 // 阻尼系數
       // cameraControl.autoRotate = true // 啟用自動旋轉
 
-      // 簡單的地板
+      // 簡單的地板
       const planeGeometry = new THREE.PlaneGeometry(60, 60)
       const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
       let plane = new THREE.Mesh(planeGeometry, planeMaterial)
@@ -137,6 +137,8 @@ export default {
       plane.position.set(0, -7, 0)
       plane.receiveShadow = true
       scene.add(plane)
+
+      createCreeper()
 
       // 設置環境光提供輔助柔和白光
       let ambientLight = new THREE.AmbientLight(0x404040)
@@ -147,14 +149,17 @@ export default {
       spotLight.position.set(-10, 30, 20)
       scene.add(spotLight)
 
+      const sphere = new THREE.SphereGeometry(0.5, 16, 8)
+      pointLight = new THREE.PointLight(0xff0000, 400)
+      pointLight.add(
+        new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0040 }))
+      )
       // 移動點光源
-      pointLight = new THREE.PointLight(0xccffcc, 0.5, 100) // 顏色, 強度, 距離
       pointLight.castShadow = true // 投影
       pointLight.position.set(-10, 16, 10)
       scene.add(pointLight)
 
       // 產生苦力怕物件並加到場景
-      createCreeper()
 
       let datGUIControls = new (function () {
         this.startTracking = false
